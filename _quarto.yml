@@ -3,12 +3,12 @@ project:
   output-dir: docs
 
 website:
-  title: "YOURNAME Data Analysis Portfolio"
+  title: "EMMA HARDIN-PARKER: DATA ANALYSIS PORTFOLIO"
   navbar:
     left:
-      - text: "About Me"
+      - text: "ABOUT ME"
         file: aboutme.qmd
-      - text: "Projects"
+      - text: "PROJECTS"
         menu:
           - text: "Starter Analysis Exercise"
             file: starter-analysis-exercise/products/report/starter-analysis-report.qmd
@@ -20,11 +20,11 @@ website:
             file: tidytuesday-exercise/tidytuesday-exercise.qmd
     right:
       - icon: github 
-        href: URL-TO-THIS-REPOSITORY-HERE        
+        href: https://github.com/ehardinparker/emmahardinparker-MADA-portfolio      
 
 format:
   html:
-    theme: cosmo
+    theme: lux
     highlight: zenburn
     css: styles.css
     toc: FALSE

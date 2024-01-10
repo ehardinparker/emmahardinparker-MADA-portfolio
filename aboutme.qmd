@@ -1,7 +1,17 @@
 ---
-title: "About me"
+title: "ABOUT ME"
 ---
 
-Add some text and a figure describing myself.
+![Headshot](creech.png)
 
-For details, see the exercise instructions. 
+
+### Education & Work Experience
+I received my BS in Public Health and a minor in Data Analytics from Furman University in 2023. While at Furman, I had the opportunity to intern and work with the Institute for the Advancement of Community Health (IACH) as an evaluation coordinator. Throughout my time at IACH, I had the privilege of working with community partners such as LiveWell Greenville, the Well-Being Partnership of Greenville (WBP), and the Greenville County School System on various evaluation projects. My main research and evaluation efforts were geared towards childhood obesity, food access, ad mental health, One of my main projects was assisting in the development of a [Mental Health Indicator Dashboard](https://www.wbpgreenville.org/get-involved-1) for the WBP. 
+
+### Software Experience & Looking Forward 
+I have experience with RStudio, LaTeX, and RMarkdown from previous coursework and evaluation projects. However, I am looking to finish this class with a greater understanding of RStudio as it particularly relates to LaTeX and RMarkdown. Additionally, I am excited to be exposed to new programs and softwares! Mainly, I am looking to become more comfortable performing analyses on a variety of different data and to gain more professional knowledge of these programs. With my minor in Data Analytics, I was allowed the exposure to statistical analysis, specifically in R. 
+
+### Me outside of Academia! 
+In my free time, my favorite thing to study is beer! I am currently working toward my second level of certification under the Cicerone Program which is, for lack of a better word, a program geared to helping individuals become "sommeliers" of beer. When I am not in class or in the library, you can most likely find me behind the bar at Creature Comforts. One of the main perks of working at a brewery is being exposed to the analytics involved in brewing beer! This [article](https://beerandbrewing.com/4-steps-to-brew-better-beer-with-brewery-analytics/) explains how Beer30 software can be used to better manage brewing data as a whole and increase predictive analysis measures. Come by and grab a pint! 
+
+

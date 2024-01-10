@@ -1,15 +1,10 @@
----
-title: "My website and data analysis portfolio"
----
-
-# Hello
-
-### And hello again
-
-Welcome to **my website** and _data analysis portfolio._ 
 
 
-* Please use the `Menu Bar` above to look around.
-* Have fun!
+# WELCOME!
 
-**Feel free to change this text any way you want 😁!**
+I am a first-year MPH candidate at the University of Georgia concentrating in Biostatistics. This site will include information about me, as well as my work completed in MADA. 
+
+-   Please use the `Menu Bar` above to have a look around.
+-   Feel free to contact me at egh14911@uga.edu if you have any questions! 
+
+![My mom & I cheering on the Dawgs!](momdawg.png){width=70%}
