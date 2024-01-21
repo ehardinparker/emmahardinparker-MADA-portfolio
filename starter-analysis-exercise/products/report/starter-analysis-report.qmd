@@ -178,9 +178,12 @@ Overall, there is no statistically significant evidence to suggest that smoking_
 
 ## Strengths and Limitations
 
-One limitation of this analysis involves the two added variables: smoking_status and age. These variables were arbitrarily added for the sake of performing introductory exploratory data analysis, and not to answer any pressing research questions. 
+One limitation of this analysis involves the two added variables: smoking_status and age. These variables were arbitrarily added for the sake of performing introductory exploratory data analysis, and not to answer any pressing research questions.
 
+## Conclusions
+_What are the main take-home messages?_
 
+_Include citations in your Rmd file using bibtex, the list of references will automatically be placed at the end_
 
 This paper [@leek2015] discusses types of analyses. 
 
