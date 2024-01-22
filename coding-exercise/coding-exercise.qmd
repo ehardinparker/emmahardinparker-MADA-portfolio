@@ -2,4 +2,142 @@
 title: "R Coding Exercise"
 ---
 
-Placeholder file for the future R coding exercise.
+Loading dslabs package
+```{r}
+#loading dslabs 
+library(dslabs)
+
+
+#viewing help file for gapminder data
+help("gapminder")
+```
+
+Overview of Data Structure 
+```{r}
+str(gapminder)
+```
+Summary of the Data & Viewing the Data
+```{r}
+summary(gapminder)
+
+```
+Determining the class of gapminder
+```{r}
+class(gapminder)
+```
+
+Adding tidyverse to the library
+```{r}
+library(tidyverse)
+```
+Assigning African countries to new vector & viewing new vector 
+```{r}
+africadata <- gapminder %>%
+  filter(continent == "Africa")
+```
+
+Viewing structure and summary of africadata
+```{r}
+str(africadata)
+summary(africadata)
+```
+New object containing only infant_mortality and life_expectancy
+```{r}
+infant_expect <- subset(africadata, select = c(infant_mortality, life_expectancy))
+
+## looking a structure of infant_expect
+str(infant_expect)
+
+## summary of infant_expect 
+summary(infant_expect)
+```
+
+New object containing only population and life_expectancy
+```{r}
+pop_expect <- subset(africadata, select = c(life_expectancy, population))
+
+##structure of pop_expect
+str(pop_expect)
+
+##summary of pop_expect
+summary(pop_expect)
+```
+Library ggplot2 for future plots 
+```{r}
+library(ggplot2)
+```
+
+
+Plotting life expectancy as a function of infant mortality 
+```{r}
+expect_infant_plot <- ggplot(infant_expect, aes(x = infant_mortality, y = life_expectancy)) +
+  geom_point()
+
+expect_infant_plot
+```
+
+
+Plotting life expectancy as a function of population 
+```{r}
+expect_pop_plot <- ggplot(pop_expect, aes(x = population, y = life_expectancy)) +
+  geom_point() + 
+  scale_y_continuous()
+
+expect_pop_plot
+```
+
+To explore why there are "streaks" of data in the plot above, I manually sorted africadata by country to see how population and life_expectancy change over time. By looking at the data this way, I could see that over time as population size increased, life expectancy increased as well. For example, from 1960 to 2015, Algeria's population increased from 11,124,892to 39,666,519 and life expectancy increased from 47.50 years to 76.40 years. 
+
+
+Finding which years have NA values
+```{r}
+colSums(is.na(africadata)) ##finding out how many NA values exist for each column 
+
+where_na_infant <- africadata %>% ## creating object that clearly shows which years have missing values for infant mortality
+  filter(is.na(infant_mortality))
+
+```
+
+
+Filtering africadata to only include the year 2000
+```{r}
+africa_twothousand <- africadata %>%
+  filter(year == "2000")
+
+
+str(africa_twothousand) ## double checking structure
+summary(africa_twothousand) ## triple checking structure 
+```
+
+Plotting life expectancy as a function of infant mortality for the year 2000 
+```{r}
+expect_infant_plot2000 <- ggplot(africa_twothousand, aes(x = infant_mortality, y = life_expectancy)) +
+  geom_point()
+
+expect_infant_plot2000
+```
+
+Plotting life expectancy as a function of population for the year 2000
+```{r}
+expect_pop_plot2000 <- ggplot(africa_twothousand, aes(x = population, y = life_expectancy)) +
+  geom_point() + 
+  scale_y_continuous()
+
+expect_pop_plot2000
+```
+
+Beginning simple model fits 
+```{r}
+fit1 <- lm(life_expectancy ~ infant_mortality, africa_twothousand)
+
+fit2 <- lm(life_expectancy ~ population, africa_twothousand)
+```
+
+Summary of both fit models 
+```{r}
+summary(fit1)
+summary(fit2)
+```
+For the model fitting life expectancy as the outcome and infant mortality as the predictor, the p-value is statistically significant at 2.826 x 10^-8. This p-value alone could suggest an association between life expectancy and infant mortality. 
+
+For the model fitting life expectancy as the outcome and population as the predictor, the p-value is 0.6159, well above the typical alpha = 0.05 threshold. This indicates that there is no evidence to suggest an association or correlation between life expectancy and population. 
