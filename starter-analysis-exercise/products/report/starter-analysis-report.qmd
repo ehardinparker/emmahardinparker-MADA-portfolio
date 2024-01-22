@@ -14,8 +14,6 @@ csl: ../apa.csl
 
 Zane contributed to this exercise on Saturday 1/20
 
-The structure below is one possible setup for a data analysis project (including the course project). For a manuscript, adjust as needed. 
-You don't need to have exactly these sections, but the content covering those sections should be addressed.
 
 This uses MS Word as output format. [See here](https://quarto.org/docs/output-formats/ms-word.html) for more information. You can switch to other formats, like html or pdf. See [the Quarto documentation](https://quarto.org/) for other formats.
 
@@ -52,17 +50,20 @@ I wanted to determine whether there were relationships between age and height, a
 
 # Methods 
 
-_Describe your methods. That should describe the data, the cleaning processes, and the analysis approaches. You might want to provide a shorter description here and all the details in the supplement._
-
-
-
 
 ## Data import and cleaning
-_Write code that reads in the file and cleans it so it's ready for analysis. Since this will be fairly long code for most datasets, it might be a good idea to have it in one or several R scripts. If that is the case, explain here briefly what kind of cleaning/processing you do, and provide more details and well documented code somewhere (e.g. as supplement in a paper). All materials, including files that contain code, should be commented well so everyone can follow along._
+```{r}
+data_location <- here::here("starter-analysis-exercise","data","processed-data","processeddata2.rds")
+
+#load data. 
+mydata <- readRDS(data_location)
+```
 
 
 ## Statistical analysis
-_Explain anything related to your statistical analyses._
+
+
+
 
 
 {{< pagebreak >}}
@@ -72,7 +73,6 @@ _Explain anything related to your statistical analyses._
 
 ## Exploratory/Descriptive analysis
 
-_Use a combination of text/tables/figures to explore and describe your data. Show the most important descriptive results here. Additional ones should go in the supplement. Even more can be in the R and Quarto files that are part of your project._
 
 
 @tbl-summarytable shows a summary of the data.
@@ -91,7 +91,6 @@ knitr::kable(resulttable)
 
 ## Basic statistical analysis
 
-_To get some further insight into your data, if reasonable you could compute simple statistics (e.g. simple models with 1 predictor) to look for associations between your outcome(s) and each individual predictor variable. Though note that unless you pre-specified the outcome and main exposure, any "p<0.05 means statistical significance" interpretation is not valid._
 
 
 @fig-result shows a scatterplot figure produced by one of the R scripts.
@@ -161,7 +160,19 @@ knitr::kable(resulttable2)
 Model of Height ~ Smoking_Status + Age 
 
 ```{r}
-lmtable3
+#### Third model fit
+# fit linear model using height as outcome, smoking status and age as predictor
+lmfit3 <- lm(Height ~ Smoking_Status + Age, mydata)
+
+#place results from fit into a data frame with the tidy function
+lmtable3 <- broom::tidy(lmfit3)
+
+#look at fit results
+print(lmtable3)
+
+#save fit results table 
+
+table_file3 = here("starter-analysis-exercise", "results", "tables-files", "resulttable3.rds")
 ```
 
 THe linear regression model with height as the outcome and smoking_status and age as predictors yieled no statistically significant results suggesting there is not enough evidence that smoking_status and age are indicative of height. This contrasts the preliminary analysis of the boxplot that suggested there may be a positive association between height and smoking_status. 
@@ -181,9 +192,8 @@ Overall, there is no statistically significant evidence to suggest that smoking_
 One limitation of this analysis involves the two added variables: smoking_status and age. These variables were arbitrarily added for the sake of performing introductory exploratory data analysis, and not to answer any pressing research questions.
 
 ## Conclusions
-_What are the main take-home messages?_
 
-_Include citations in your Rmd file using bibtex, the list of references will automatically be placed at the end_
+There is no evidence to suggest there are any significant associations between height, gender, weight, smoking status, or age.
 
 This paper [@leek2015] discusses types of analyses. 
 
@@ -195,6 +205,11 @@ Note that this cited reference will show up at the end of the document, the refe
 {{< pagebreak >}}
 
 # References
+
+
+
+
+
 
 
 
