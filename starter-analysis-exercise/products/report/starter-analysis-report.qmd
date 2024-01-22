@@ -175,7 +175,7 @@ print(lmtable3)
 table_file3 = here("starter-analysis-exercise", "results", "tables-files", "resulttable3.rds")
 ```
 
-THe linear regression model with height as the outcome and smoking_status and age as predictors yieled no statistically significant results suggesting there is not enough evidence that smoking_status and age are indicative of height. This contrasts the preliminary analysis of the boxplot that suggested there may be a positive association between height and smoking_status. 
+The linear regression model with height as the outcome and smoking_status and age as predictors yieled no statistically significant results suggesting there is not enough evidence that smoking_status and age are indicative of height. This contrasts the preliminary analysis of the boxplot that suggested there may be a positive association between height and smoking_status. 
 
 {{< pagebreak >}}
 
