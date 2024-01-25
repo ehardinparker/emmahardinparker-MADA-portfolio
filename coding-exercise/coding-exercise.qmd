@@ -141,3 +141,95 @@ summary(fit2)
 For the model fitting life expectancy as the outcome and infant mortality as the predictor, the p-value is statistically significant at 2.826 x 10^-8. This p-value alone could suggest an association between life expectancy and infant mortality. 
 
 For the model fitting life expectancy as the outcome and population as the predictor, the p-value is 0.6159, well above the typical alpha = 0.05 threshold. This indicates that there is no evidence to suggest an association or correlation between life expectancy and population. 
+
+THIS SECTION CONTRIBUTED BY KEVIN KOSEWICK
+
+For this part of the exercise, I will be using the "divorce_margarine" data set that contains divorce rate/1000 people in Maine, per capita margarine consumption (lbs) in the U.S., and the year. We'll load dslabs and view the dataset.
+
+```{r}
+#loading dslabs 
+library(dslabs)
+
+
+#viewing help file for divorce_margarine data
+help("divorce_margarine")
+```
+We'll load the overview and summary of the data.
+
+```{r}
+#structure of data
+str(divorce_margarine)
+
+#summary of data
+summary(divorce_margarine)
+```
+We'll now inspect the class of the data set and load the tidyverse package to begin data processing.
+
+```{r}
+#check the class
+class(divorce_margarine)
+
+#load tidyverse
+library(tidyverse)
+```
+We will create an object with only divorce rate and margarine consumption.
+
+```{r}
+#first, make an object with divorce_margarine data set
+fulldivorce<- divorce_margarine
+
+#next, make the object with only divorce_rate_maine and margarine_consumption_per_capita
+margdivorce <- subset(divorce_margarine, select = c(divorce_rate_maine, margarine_consumption_per_capita))
+
+#structure and summary checks
+str(margdivorce)
+summary(margdivorce)
+```
+Plot divorce rate as a function of margarine consumption.
+
+```{r}
+#load ggplot for plot design
+library(ggplot2)
+#plot divorce as a function of margarine
+divorce_margarine_plot <- ggplot(margdivorce, aes(x = divorce_rate_maine, y = margarine_consumption_per_capita)) +
+  geom_point()
+#load the plot
+plot(divorce_margarine_plot)
+```
+The plot indicates a strong positive correlation between margarine consumption and divorce rates. The true enemy of all Maine marriages seems to be butter substitutes. Now we'll plot divorce rates as a function of the year.
+
+```{r}
+#create an object with just year and divorce rates
+yeardivorce <- subset(divorce_margarine, select = c(divorce_rate_maine, year))
+#plot divorce as a function of the year
+divorce_year_plot <- ggplot(yeardivorce, aes(x = divorce_rate_maine, y = year)) +
+  geom_point()
+#load the plot
+plot(divorce_year_plot)
+```
+Our plot indicates that divorce rates have decreased over time in Maine. We'll now make a plot to see how margarine consumption has changed over the years. 
+
+```{r}
+#make an object with just margarine consumption and years
+yearmarg <- subset(divorce_margarine, select = c(margarine_consumption_per_capita, year))
+#plot margarine consumption as a function of the year
+margarine_year_plot <- ggplot(yearmarg, aes(x = margarine_consumption_per_capita, y = year)) +
+  geom_point()
+#plot it
+plot(margarine_year_plot)
+```
+
+Our plot indicates that margarine consumption has decreased over the years. The year is negatively correlated with both margarine consumption and divorce rates; however, divorce seems to be more frequent in years with higher margarine consumption. To make sure that America's consumption of margarine is truly the reason for failed marriages in Maine, we'll create some linear models. First, we'll fit just margarine consumption as a predictor for divorce rates. Then, we'll fit both year and margarine as predictors for divorce rates.
+
+```{r}
+#fit margarine as a predictor for divorce
+fit_margarine_only <- lm(divorce_rate_maine ~ margarine_consumption_per_capita, divorce_margarine)
+
+#fit marg and year as predicotrs for divorce
+fit_margarine_year <- lm(divorce_rate_maine ~ margarine_consumption_per_capita + year, divorce_margarine)
+
+#call both plots
+summary(fit_margarine_only)
+summary(fit_margarine_year)
+```
+Our models indicate that year is not a statistically significant predictor of divorce rates, but margarine consumption is. Both models apparently describe most of the variation as well given our R-squared values. These results would seem to indicate that we can attribute more frequent divorces in Maine to the amount of margarine Americans consume a year. However, if given a bit of thought, this correlation makes no sense and should not be equated to causation. Regardless, it's a fun analysis to run.
