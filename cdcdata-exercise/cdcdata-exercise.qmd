@@ -1,0 +1,184 @@
+---
+title: "CDC Data Exercise"
+author: "Emma Hardin-Parker"
+date: "02/07/2024"
+---
+
+### Data Introduction and Loading
+
+I accessed the data for this assignment at this [link](https://data.cdc.gov/NCHS/NCHS-VSRR-Quarterly-provisional-estimates-for-sele/76vv-a7x8/about_data). I chose a data set from the National Center for Health Statistics (NCHS) that provides data on quarterly provisional estimates for selected birth indicators.
+
+I am now going to load any required packages along with the original, uncleaned data set.
+
+```{r}
+library(readr)
+library(here)
+library(tidyverse)
+library(ggplot2)
+
+nchs_data <- read.csv("~/Desktop/NCHS_-_VSRR_Quarterly_provisional_estimates_for_selected_birth_indicators_20240206.csv")
+View(nchs_data)
+```
+
+### Initial Data Exploration and Cleaning
+
+I am now going to get a quick look at the data by using the str(), summary(), and glimpse() functions.
+
+```{r}
+str(nchs_data)
+summary(nchs_data)
+glimpse(nchs_data)
+```
+
+The data set has 1,110 observations and 8 variables. At first glance there doesn't seem to be any NA values, but I am going to check using the NA values. After print nchs_na, I found that there were no NA values, however, I took that command out as it printed "FALSE" for every observation in the data set. Also, I noticed in the Significant column, that significant values are coded with asteriks. I could imagine that would make future exploratory analyses difficult, so I plan to recode significant values to 1 and non-significant values to 0. To accomplish this I used the is.naa() function to determine if there were any
+
+```{r}
+nchs_na <- is.na(nchs_data)
+
+nchs_data <- nchs_data %>%
+  mutate(Significant = as.character(Significant))
+
+nchs_recode <- nchs_data %>%
+  mutate(Significance_Status = case_when(
+    Significant == "*" ~ 1,
+    Significant == "" ~ 0,
+    TRUE ~ NA_integer_  
+  ))
+```
+
+To accomplish this I used the is.na() function to determine if there were any NA values in the data set. I then mutated the Significant column to treat the observations as characters (\* or missing) by using as.character(). I then mutated a new variable, Significance_Status to recode the missing values as zeroes and the asteriks as ones.
+
+### Exploratory Data Analysis
+
+I am now going to create an exploratory plot to see which race/ethnicity category had the largest birth rate by Year & Quarter.
+
+```{r}
+filtered_race <- nchs_recode %>%
+  filter(Race.Ethnicity.Category != "All races and origins")  # Remove rows where 'Race' is "All"
+
+
+birth_rate_bar <- filtered_race %>%
+  group_by(Year.and.Quarter) %>%
+  filter(Topic == "Birth Rates") %>% 
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Birth Rate Rate by Age Category and Race",
+       x = "Age Category / Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))  
+
+hispanic_rate_bar <- nchs_recode %>%
+  filter(Race.Ethnicity.Category == "Hispanic") %>%
+  filter(Topic == "Birth Rates") %>%
+  group_by(Year.and.Quarter) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Birth Rate Rate by Age Category and Race",
+       x = "Age Category / Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) 
+
+white_rate_bar <- nchs_recode %>%
+  filter(Race.Ethnicity.Category == "Non-Hispanic White") %>%
+  filter(Topic == "Birth Rates") %>%
+  group_by(Year.and.Quarter) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Birth Rate Rate by Age Category and Race",
+       x = "Age Category / Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  scale_color_viridis_d()
+
+black_rate_bar <- nchs_recode %>%
+  filter(Race.Ethnicity.Category == "Non-Hispanic Black") %>%
+  filter(Topic == "Birth Rates") %>%
+  group_by(Year.and.Quarter) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Birth Rate Rate by Age Category and Race",
+       x = "Age Category / Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  scale_color_viridis_b() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+
+print(hispanic_rate_bar)
+print(black_rate_bar)
+print(white_rate_bar)
+```
+
+I am now going to create plots exploring the rate of low birthweight (per 100 births) by race
+
+```{r}
+low_birth <- filtered_race %>%
+  filter(Topic.Subgroup == "Low Birthweight Rates") %>%
+  group_by(Race.Ethnicity.Category) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Low Birthweight Rates by Race",
+       x = "Age Category / Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  scale_color_identity() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+print(low_birth)
+```
+
+I am now going to create a similar plot concerning preterm birth rates per 100 births by race.
+
+```{r}
+pre_birth <- filtered_race %>%
+  filter(Topic.Subgroup == "Preterm Birth Rates") %>%
+  group_by(Race.Ethnicity.Category) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Preterm Birth Rates by Race",
+       x = "Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  scale_color_identity() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+print(pre_birth)
+```
+
+I am now going to create a similar plot concerning NICU admission rates per 100 births by race.
+
+```{r}
+NICU <- filtered_race %>%
+  filter(Topic.Subgroup == "NICU Admission Rates") %>%
+  group_by(Race.Ethnicity.Category) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "NICU Admission Rates by Age Category and Race",
+       x = "Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  scale_color_identity() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+print(NICU)
+```
+
+I am now going to create a similar plot exploring Teen Birth Rates by Age Category and Race
+
+```{r}
+teen_birth <- filtered_race %>%
+  filter(Topic.Subgroup == "Teen Birth Rates") %>%
+  group_by(Race.Ethnicity.Category) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = " Teen Birth Rate Rate by Age Category and Race",
+       x = "Age Category / Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  scale_color_viridis_b() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+print(teen_birth)
+```
