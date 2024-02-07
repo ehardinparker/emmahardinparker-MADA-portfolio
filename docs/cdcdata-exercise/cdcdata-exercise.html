@@ -214,7 +214,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="data-introduction-and-loading" class="level3">
 <h3 class="anchored" data-anchor-id="data-introduction-and-loading">Data Introduction and Loading</h3>
-<p>I accessed the data for this assignment at this <a href="https://data.cdc.gov/NCHS/NCHS-VSRR-Quarterly-provisional-estimates-for-sele/76vv-a7x8/about_data">link</a>. I chose a data set from the National Center for Health Statistics (NCHS) that provides data on quarterly provisional estimates for selected birth indicators.</p>
+<p>I accessed the data for this assignment at this <a href="https://data.cdc.gov/NCHS/NCHS-VSRR-Quarterly-provisional-estimates-for-sele/76vv-a7x8/about_data">link</a>. I chose a data set from the National Center for Health Statistics (NCHS) that provides data on quarterly provisional estimates for selected birth indicators. These indicators include teen birth rate, low birth weight, NICU admissions, pre-term births, etc. These indicators are stratified by race/ethnicity and age groups. There is an overall Rate column that is subsetted into “per 100 births” or “per 1,000 population.”</p>
 <p>I am now going to load any required packages along with the original, uncleaned data set.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
@@ -289,7 +289,7 @@ $ Unit                    &lt;chr&gt; "per 1,000 population", "per 1,000 populat
 $ Significant             &lt;chr&gt; "", "", "*", "", "*", "*", "*", "*", "*", "*",…</code></pre>
 </div>
 </div>
-<p>The data set has 1,110 observations and 8 variables. At first glance there doesn’t seem to be any NA values, but I am going to check using the NA values. After print nchs_na, I found that there were no NA values, however, I took that command out as it printed “FALSE” for every observation in the data set. Also, I noticed in the Significant column, that significant values are coded with asteriks. I could imagine that would make future exploratory analyses difficult, so I plan to recode significant values to 1 and non-significant values to 0. To accomplish this I used the is.naa() function to determine if there were any</p>
+<p>The data set has 1,110 observations and 8 variables. At first glance there doesn’t seem to be any NA values, but I am going to check using the NA values. After print nchs_na, I found that there were no NA values, however, I took that command out as it printed “FALSE” for every observation in the data set. Also, I noticed in the Significant column, that significant values are coded with asteriks. I could imagine that would make future exploratory analyses difficult, so I plan to recode significant values to 1 and non-significant values to 0.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>nchs_na <span class="ot">&lt;-</span> <span class="fu">is.na</span>(nchs_data)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
