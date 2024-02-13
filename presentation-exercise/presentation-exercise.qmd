@@ -1,5 +1,92 @@
 ---
 title: "Presentation Exercise"
+author: "Emma Hardin-Parker" 
+date: "12 February 2024" 
 ---
 
-Placeholder file for the future data/results presentation exercise.
+I chose a [FiveThirtyEight](https://projects.fivethirtyeight.com/trump-approval-ratings/) article that visualized the approval and disapproval ratings of Donald Trump, over time. I used ChatGPT to help me formulate some of the code. Given that I am fairly comfortable with the ggplot2 package in R, I decided to use the plotly package for this assignment. I was unsuccessful in providing ChatGPT the actual dataset, so I was unable to reproduce the graph in its entirety; however, I seemed to get pretty close. I have also attached the snapshot of the original graph to this document. 
+
+Here is the figure I am going to recreate 
+![Original Figure](538-trump.png)
+
+Loading required packages
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(gt)
+library(plotly)
+library(dplyr)
+```
+
+Loading the data set from FiveThirtyEight 
+
+```{r}
+trump_approval <- read.csv("~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/presentation-exercise/approval_polllist.csv")
+View(trump_approval)
+```
+
+Now that I have loaded the data along with all required libraries, I am going to attempt to recreate the plot. 
+
+```{r}
+#Transforming the End Date variable to a Date format
+
+trump_approval$enddate <- as.Date(trump_approval$enddate, format = "%m/%d/%Y")
+
+# Create a new column for the year to ensure correct ordering of the x axis 
+trump_approval$year <- as.factor(format(trump_approval$enddate, "%Y"))
+
+
+#Recreating the plot
+
+trump1 <- plot_ly(trump_approval, x = ~enddate) %>%
+  add_lines(y = ~adjusted_approve, name = "Approve", color = I("#006400"), hoverinfo = "y+name+text",
+            text = ~paste("Date: ", enddate, "<br>", "Approve: ", adjusted_approve, "%")) %>%
+  add_lines(y = ~adjusted_disapprove, name = "Disapprove",color = I("orange"), hoverinfo = "y+name+text",
+            text = ~paste("Date: ", enddate, "<br>", "Disapprove: ", adjusted_disapprove, "%")) %>%
+  layout(title = "How unpopular is Donald Trump?",
+         xaxis = list(title = "Date", categoryorder = "trace"),
+         yaxis = list(title = "Percentage"),
+         hovermode = "closest")
+trump1
+```
+
+Note: For some reason, when I used the print() function on the plot, the R Console returned "NULL" and the plot would not print. However, if I simply highlighted the trump1 argument at the beginning of the plot code, it would print and work as intended (i.e. interactive). I went ahead and downloaded the plot as a .png file and included the plot in this document. 
+
+
+Though I was unable to reproduce the graph fully, I was pleased with the results. This was my first time using plotly() or creating any interactive graphs in R, so I am okay with the turnout. 
+
+I am also going to provide a brief look into my conversation with ChatGPT and how it helped me create this graph. Note: I ended up changing datasets halfway through this assignment so not all of the data names pertain to the graph I reproduced. I have provided the [link](https://chat.openai.com/share/dc121221-7048-4c0d-890c-303ee3a5a324) here. Some of this conversation is irrelevant to the process I ended up using (i.e. I at first thought I was going to be able to share CSV content directly to ChatGPT). 
+
+I am now going to create a publication table using the gt() package
+
+```{r}
+#Loading required packages
+library(flextable)
+
+#Subsetting the data to only include the variables needed for the table
+subset_trump <- trump_approval %>%
+  select(c("pollster", "grade", "weight", "approve", "disapprove", "adjusted_approve", "adjusted_disapprove")) 
+head(subset_trump) ##checking to make sure the data was subset correctly 
+
+aggregate_data <- subset_trump %>%
+  group_by(pollster) %>%
+  summarise(
+    grade = first(grade),
+    weight = first(weight),
+    approve = first(approve),
+    disapprove = first(disapprove),
+    adjusted_approve = first(adjusted_approve),
+    adjusted_disapprove = first(adjusted_disapprove)
+  )
+
+#Creating the table using the flextable package
+
+trump_table2 <- flextable(aggregate_data)
+trump_table2 <- add_header_row(trump_table2, values = c("Pollster", "Grade", "Weight", "Approval", "Disapprove", "Adjusted Approval", "Adjusted Disapprove"))
+trump_table2
+```
+
+I am also going to provide a brief look into my conversation with ChatGPT and how it helped me create this graph. Note: I ended up changing datasets halfway through this assignment so not all of the data names pertain to the graph I reproduced. I have provided the [link](https://chat.openai.com/share/dc121221-7048-4c0d-890c-303ee3a5a324) here. Some of this conversation is irrelevant to the process I ended up using (i.e. I at first thought I was going to be able to share CSV content directly to ChatGPT). 
+
+
+
