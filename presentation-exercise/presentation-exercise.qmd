@@ -50,12 +50,9 @@ trump1 <- plot_ly(trump_approval, x = ~enddate) %>%
 trump1
 ```
 
-Note: For some reason, when I used the print() function on the plot, the R Console returned "NULL" and the plot would not print. However, if I simply highlighted the trump1 argument at the beginning of the plot code, it would print and work as intended (i.e. interactive). I went ahead and downloaded the plot as a .png file and included the plot in this document. 
-
 
 Though I was unable to reproduce the graph fully, I was pleased with the results. This was my first time using plotly() or creating any interactive graphs in R, so I am okay with the turnout. 
 
-I am also going to provide a brief look into my conversation with ChatGPT and how it helped me create this graph. Note: I ended up changing datasets halfway through this assignment so not all of the data names pertain to the graph I reproduced. I have provided the [link](https://chat.openai.com/share/dc121221-7048-4c0d-890c-303ee3a5a324) here. Some of this conversation is irrelevant to the process I ended up using (i.e. I at first thought I was going to be able to share CSV content directly to ChatGPT). 
 
 I am now going to create a publication table using the gt() package
 
