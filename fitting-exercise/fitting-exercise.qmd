@@ -1,0 +1,300 @@
+---
+title: "Fitting Exercise"
+author: "Emma Hardin-Parker"
+date: "02/27/2024"
+---
+
+Loading necessary packages 
+
+```{r message=FALSE}
+library(tidymodels)
+library(tidyverse)
+library(ggplot2)
+library(yardstick)
+library(pROC)
+```
+
+Importing the dataset, titled Mavoglurant, from this [GitHub repository](https://github.com/metrumresearchgroup/BayesPBPK-tutorial/blob/master/data/Mavoglurant_A2121_nmpk.csv)
+
+```{r}
+mavoglurant <- read.csv("~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise/Mavoglurant_A2121_nmpk.csv")
+```
+
+EDA of the Mavoglurant data set 
+
+```{r}
+# Summary table of the data prior to any mutation or cleaning 
+print(summary(mavoglurant))
+```
+
+  
+Plotting the outcome variable (DV) as a function of time, stratified by DOSE, and grouped by ID 
+
+```{r}
+# Plot DV vs. time, stratified by DOSE and grouped by ID
+dv_dose <- ggplot(mavoglurant, aes(x = TIME, y = DV, group = ID, color = DOSE)) +
+  geom_line() +
+  geom_point() +
+  labs(x = "Time", y = "Outcome Variable (DV)", color = "Dose") +
+  ggtitle("Outcome Variable vs. Time Stratified by Dose") +
+  theme_minimal()
+print(dv_dose)
+```
+
+
+Filtering the data set to only include OCC = 1 observations 
+
+```{r}
+strat_mavo <- mavoglurant %>%
+  filter(OCC == "1")
+```
+
+Filtering the data set to only include non zero values for TIME, computing the sum of DV and assigning it to variable Y, 
+
+```{r}
+# Exclude observations with TIME = 0
+filtered_mavo <- strat_mavo %>%
+  filter(TIME != 0)
+
+# Compute the sum of DV variable for each individual
+summarized_mavo <- filtered_mavo %>%
+  group_by(ID) %>%
+  summarize(Y = sum(DV))
+
+# Create a data frame with observations where TIME == 0
+time_zero_data <- strat_mavo %>%
+  filter(TIME == 0)
+
+# Join the summarized data with the data at time zero
+joined_mavo <- left_join(summarized_mavo, time_zero_data, by = "ID")
+
+# Print the dimensions of the combined data frame
+dim(joined_mavo)
+```
+
+Converting RACE and SEX variables to factor variables and only including necessary columns as well as printing a summary table of the joined data set.
+
+```{r}
+# Convert RACE and SEX to factor variables
+joined_mavo <- joined_mavo %>%
+  mutate(RACE = factor(RACE),
+         SEX = factor(SEX))
+
+# Keep only the desired variables
+joined_mavo <- joined_mavo %>%
+  select(Y, DOSE, AGE, SEX, RACE, WT, HT)
+
+# View the first few rows of the joined data set
+head(joined_mavo)
+
+# Summary Table of joined_mavo 
+print(summary(joined_mavo))
+```
+
+Now it's time to create some figures and tables to explore the new joined data set, joined_mavo. Since a codebook was not provided, I am going to create some plots to try to assume which values of SEX (1 or 2) correlate with Male and Female.
+
+```{r}
+# Relationship between SEX and DOSE
+
+sex_dose <- ggplot(joined_mavo, aes(x = DOSE, fill = SEX)) +
+  geom_bar(position = "dodge", color = "black") +
+  labs(x = "Dose", y = "Count", fill = "SEX") +
+  ggtitle("Relationship between DOSE and SEX") +
+  scale_fill_manual(values = c("1" = "lightblue", "2" = "lightgreen")) +
+  theme_minimal()
+print(sex_dose)
+
+#Relationship between SEX and WT (weight)
+
+sex_wt <- ggplot(joined_mavo, aes(x = SEX, y = WT, fill = SEX)) +
+  geom_boxplot() +
+  labs(x = "SEX", y = "Weight", fill = "SEX") +
+  ggtitle("Relationship between Sex and Weight") +
+  scale_fill_manual(values = c("1" = "lightblue", "2" = "lightgreen")) +
+  theme_minimal()
+print(sex_wt)
+
+```
+
+As we can see from the plot exploring the relationship between sex and dose, the sex assigned the value 1 had much higher doses on average than the sex assigned the value 2. When exploring the relationship between sex and weight, we can see that sex assigned the value 1 weighs considerably more on average than the sex assigned value 2. From these plots I can comfortably assume that SEX = 1 corresponds to Male and SEX = 2 corresponds to female. 
+
+
+Creating plots to determine a relationship between AGE and Y. 
+
+```{r}
+y_age <- ggplot(joined_mavo, aes(x = AGE, y = Y)) +
+  geom_point() +
+  labs(x = "Age", y = "Y") +
+  ggtitle("Relationship between Y and Age") +
+  theme_minimal()
+print(y_age)
+```
+From this plot we can see no discernible relationship between the outcome variable Y and Age. 
+
+
+Now we are going to move onto model fitting. Please note that I had trouble using the rmse() function due to strange errors so I had to rework the coding process to calculate the RMSE and R-squared values. I also elected to use the pROC package to help me compute ROC-AUC values for the logistic models. 
+
+
+Fitting a linear model to the continuous outcome (Y) using the main predictor of interest, DOSE.
+
+```{r}
+# Fit a linear model
+y_dose_model <- lm(Y ~ DOSE, data = joined_mavo)
+
+# Summarize the model
+tidy(y_dose_model)
+```
+
+Fitting a linear model to Y using all predictors
+
+```{r}
+# Fit a linear model using all predictors
+y_all_model <- lm(Y ~ ., data = joined_mavo)
+
+# Summarize the model
+tidy(y_all_model)
+```
+
+Calculating RMSE and R-Squared values for both models, y_dose_model & y_all_model. 
+
+```{r}
+### y_dose_model calculations 
+
+#Calculating predictions for y_dose_model 
+
+preds_dose <- predict(y_dose_model, newdata = joined_mavo)
+
+#Creating dataframe of original values of Y and predictions
+preds_dose_data <- bind_cols(preds_dose, joined_mavo$Y) %>%
+  rename(Y = "...2")
+
+
+## Compute RMSE for y_dose_model
+
+# Calculate residuals
+residuals <- preds_dose - joined_mavo$Y
+
+# Compute RMSE
+rmse <- sqrt(mean(residuals^2))
+
+# Compute R-squared
+r_squared <- 1 - sum(residuals^2) / sum((joined_mavo$Y - mean(joined_mavo$Y))^2)
+
+# Print RMSE and R-squared
+cat("RMSE:", rmse, "\n")
+cat("R-squared:", r_squared, "\n")
+
+```
+The RMSE value of 666 could indicate large amounts of error or poor model performance. The R-squared value of 0.51 (~51%) could also indicate poorer model performance as we would like to maximize R-squared. 
+
+
+```{r}
+### y_all_model calculations
+
+#Calculating predictions for y_all_model 
+
+preds_all <- predict(y_all_model, newdata = joined_mavo)
+
+#Creating dataframe of original values of Y and predictions
+preds_all_data <- bind_cols(preds_all, joined_mavo$Y) %>%
+  rename(Y = "...2")
+
+
+## Compute RMSE for y_dose_model
+
+# Calculate residuals
+residuals2 <- preds_all - joined_mavo$Y
+
+# Compute RMSE
+rmse2 <- sqrt(mean(residuals2^2))
+
+# Compute R-squared
+r_squared2 <- 1 - sum(residuals2^2) / sum((joined_mavo$Y - mean(joined_mavo$Y))^2)
+
+# Print RMSE and R-squared
+cat("RMSE:", rmse2, "\n")
+cat("R-squared:", r_squared2, "\n")
+```
+This model performed better than the previous model. Our RMSE is lower (590) and our R-squared is higher at 0.619 (~62%). 
+
+
+Now we are going to move on to logistic models for the binary outcome (SEX) using DOSE as the main predictor of interest. 
+
+```{r}
+#Fit a logistic model to  SEX using the main predictor of interest,DOSE.
+logit_sex_model <- glm(SEX ~ DOSE, data = joined_mavo, family = binomial)
+
+# Summarize the model
+tidy(logit_sex_model)
+```
+Now I am going to fit a logistic model to sex using all predictors 
+
+```{r}
+# Fit logistic model with all predictors
+logit_model_all <- glm(SEX ~ ., data = joined_mavo, family = binomial)
+
+# Summarize the model
+tidy(logit_model_all)
+
+```
+Computing ROC-AUC and accuracy for logit_sex_model 
+
+```{r}
+##ACCURACY 
+
+# Predict SEX using the logistic model with only DOSE as a predictor
+predsdose <- predict(logit_sex_model, type = "response")
+
+# Convert predicted probabilities to binary predictions (0 or 1)
+preds_dose_binary <- ifelse(predsdose > 0.5, 1, 0)
+
+# Compute accuracy
+accuracy <- mean(preds_dose_binary == joined_mavo$SEX)
+
+# Print accuracy
+cat("Accuracy:", accuracy, "\n")
+
+##ROC-AUC 
+
+# Compute ROC-AUC for the logistic model with only DOSE as a predictor
+roc_auc <- roc(joined_mavo$SEX, predict(logit_sex_model, type = "response"))
+
+# Calculate AUC
+auc <- auc(roc_auc)
+
+# Print ROC-AUC
+cat("ROC-AUC for the logistic model with only DOSE as a predictor:", auc, "\n")
+
+```
+An accuracy of 0 indicates that the model's predictions did not match any of the observed values in the data. A ROC-AUC value of 0.59 is not particularly great as it could suggest that the model's predictions are not far off from what could be considered random chance. 
+
+
+Computing ROC-AUC and accuracy for logit_model_all
+
+```{r}
+##ACCURACY
+
+# Predict SEX using the logistic model with all predictors
+preds_sex <- predict(logit_model_all, type = "response")
+
+# Convert predicted probabilities to binary predictions (0 or 1)
+preds_binary_sex <- ifelse(preds_sex > 0.5, 1, 0)
+
+# Compute accuracy
+accuracy2 <- mean(preds_binary_sex == joined_mavo$SEX)
+
+# Print accuracy
+cat("Accuracy:", accuracy2, "\n")
+
+##ROC-AUC
+
+# Compute ROC-AUC for the logistic model with only DOSE as a predictor
+roc_auc2 <- roc(joined_mavo$SEX, predict(logit_model_all, type = "response"))
+
+# Calculate AUC
+auc2 <- auc(roc_auc2)
+
+# Print ROC-AUC
+cat("ROC-AUC for the logistic model with only DOSE as a predictor:", auc2, "\n")
+```
+An accuracy level of 0.025 suggests that the model is only "correct" in its predictions for 2.5% of observations. However, this model produced a very high and favorable ROC-AUC value of 0.9795 indicating a strong predictive performance in distinguishing between the two outcomes of the binary variable. 
