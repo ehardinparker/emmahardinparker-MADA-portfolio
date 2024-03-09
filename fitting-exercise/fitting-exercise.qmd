@@ -14,7 +14,7 @@ library(yardstick)
 library(pROC)
 ```
 
-Importing the dataset, titled Mavoglurant, from this [GitHub repository](https://github.com/metrumresearchgroup/BayesPBPK-tutorial/blob/master/data/Mavoglurant_A2121_nmpk.csv)
+Importing the Mavoglurant dataset from this [GitHub repository](https://github.com/metrumresearchgroup/BayesPBPK-tutorial/blob/master/data/Mavoglurant_A2121_nmpk.csv)
 
 ```{r}
 mavoglurant <- read.csv("~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise/Mavoglurant_A2121_nmpk.csv")
