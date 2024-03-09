@@ -228,7 +228,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mavoglurant <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise/Mavoglurant_A2121_nmpk.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>EDA of the Mavoglurant data set</p>
+<section id="exploratory-data-analysis-of-the-mavoglurant-data-set" class="level3">
+<h3 class="anchored" data-anchor-id="exploratory-data-analysis-of-the-mavoglurant-data-set">Exploratory Data Analysis of the Mavoglurant data set</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary table of the data prior to any mutation or cleaning </span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">summary</span>(mavoglurant))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -413,6 +414,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>From this plot we can see no discernible relationship between the outcome variable Y and Age.</p>
+</section>
+<section id="model-fitting" class="level3">
+<h3 class="anchored" data-anchor-id="model-fitting">Model Fitting</h3>
 <p>Now we are going to move onto model fitting. Please note that I had trouble using the rmse() function due to strange errors so I had to rework the coding process to calculate the RMSE and R-squared values. I also elected to use the pROC package to help me compute ROC-AUC values for the logistic models.</p>
 <p>Fitting a linear model to the continuous outcome (Y) using the main predictor of interest, DOSE.</p>
 <div class="cell">
@@ -641,6 +645,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>An accuracy level of 0.025 suggests that the model is only “correct” in its predictions for 2.5% of observations. However, this model produced a very high and favorable ROC-AUC value of 0.9795 indicating a strong predictive performance in distinguishing between the two outcomes of the binary variable.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

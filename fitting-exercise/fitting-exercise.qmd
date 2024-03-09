@@ -20,7 +20,7 @@ Importing the Mavoglurant dataset from this [GitHub repository](https://github.c
 mavoglurant <- read.csv("~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise/Mavoglurant_A2121_nmpk.csv")
 ```
 
-EDA of the Mavoglurant data set 
+### Exploratory Data Analysis of the Mavoglurant data set 
 
 ```{r}
 # Summary table of the data prior to any mutation or cleaning 
@@ -131,6 +131,8 @@ print(y_age)
 ```
 From this plot we can see no discernible relationship between the outcome variable Y and Age. 
 
+
+### Model Fitting
 
 Now we are going to move onto model fitting. Please note that I had trouble using the rmse() function due to strange errors so I had to rework the coding process to calculate the RMSE and R-squared values. I also elected to use the pROC package to help me compute ROC-AUC values for the logistic models. 
 
