@@ -182,3 +182,164 @@ teen_birth <- filtered_race %>%
 
 print(teen_birth)
 ```
+
+
+
+
+This section contributed by KEVIN KOSEWICK.
+
+For this section, I'll create a synthetic dataset that attempts to mimic the original as closely as possible. To do this, I'll scramble the variables (in the way that a synthetic scrambled set was produced in the module for synthetic data) that Emma explored originally and reproduce her analyses and see what we get. 
+
+```{r}
+#set seed for reproducability
+set.seed(123)
+
+# Create a copy of the original data frame
+filtered_copy <- filtered_race
+
+# Scramble the column in the copied data frame
+filtered_copy$Rate <- sample(filtered_race$Rate)
+
+#check the new scrambled set to make sure everything is the same except for the numbers we wanted to change
+summary(filtered_copy)
+structure(filtered_copy)
+glimpse(filtered_copy)
+
+#compare to the original
+summary(filtered_race)
+structure(filtered_race)
+glimpse(filtered_race)
+```
+We can see that the numbers have clearly been swapped around for the Rate column. Now, we can create the same plots Emma did on our scrambled set and see how things have changed.
+
+```{r}
+
+birth_rate_bar2 <- filtered_copy %>%
+  group_by(Year.and.Quarter) %>%
+  filter(Topic == "Birth Rates") %>% 
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Birth Rate Rate by Age Category and Race",
+       x = "Age Category / Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))  
+
+hispanic_rate_bar2 <- filtered_copy %>%
+  filter(Race.Ethnicity.Category == "Hispanic") %>%
+  filter(Topic == "Birth Rates") %>%
+  group_by(Year.and.Quarter) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Birth Rate Rate by Age Category and Race",
+       x = "Age Category / Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) 
+
+white_rate_bar2 <- filtered_copy %>%
+  filter(Race.Ethnicity.Category == "Non-Hispanic White") %>%
+  filter(Topic == "Birth Rates") %>%
+  group_by(Year.and.Quarter) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Birth Rate Rate by Age Category and Race",
+       x = "Age Category / Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  scale_color_viridis_d()
+
+black_rate_bar2 <- filtered_copy %>%
+  filter(Race.Ethnicity.Category == "Non-Hispanic Black") %>%
+  filter(Topic == "Birth Rates") %>%
+  group_by(Year.and.Quarter) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Birth Rate Rate by Age Category and Race",
+       x = "Age Category / Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  scale_color_viridis_b() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+#compare new to original
+print(hispanic_rate_bar2)
+print(black_rate_bar2)
+print(white_rate_bar2)
+print(hispanic_rate_bar)
+print(black_rate_bar)
+print(white_rate_bar)
+```
+We can see that these distributions are very different, yet the structure of the data is the same. Scrambling the rates has totally changed the analysis we produce; the data has gone from a relatively normal distribution from the original dataset to a pretty random distribution in the scrambled data. Let's look at the other plots.
+
+```{r}
+low_birth2 <- filtered_copy %>%
+  filter(Topic.Subgroup == "Low Birthweight Rates") %>%
+  group_by(Race.Ethnicity.Category) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Low Birthweight Rates by Race",
+       x = "Age Category / Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  scale_color_identity() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+print(low_birth2)
+print(low_birth)
+```
+This one wasn't changed as dramatically, but the distribution has gone from normal to skewed. Let's look at the preterm birthrate data now.
+
+```{r}
+pre_birth2 <- filtered_copy %>%
+  filter(Topic.Subgroup == "Preterm Birth Rates") %>%
+  group_by(Race.Ethnicity.Category) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Preterm Birth Rates by Race",
+       x = "Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  scale_color_identity() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+print(pre_birth2)
+print(pre_birth)
+```
+Now, the data makes no sense in the scrambled set. Late preterms are higher than total preterms in Hispanic and Black data, where early and late are far higher than total in the hispanic white data. The original set followed a much more logical pattern. Let's recreate the NICU admission plots.
+
+```{r}
+NICU2 <- filtered_copy %>%
+  filter(Topic.Subgroup == "NICU Admission Rates") %>%
+  group_by(Race.Ethnicity.Category) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "NICU Admission Rates by Age Category and Race",
+       x = "Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  scale_color_identity() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+print(NICU2)
+print(NICU)
+```
+We can see that the rates are far higher in the scrambled data than the original data. The distribution has also changed, with White NICU Admissions being much higher than the original set. Let's explore the last plot's differences.
+
+```{r}
+teen_birth2 <- filtered_copy %>%
+  filter(Topic.Subgroup == "Teen Birth Rates") %>%
+  group_by(Race.Ethnicity.Category) %>%
+  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = " Teen Birth Rate Rate by Age Category and Race",
+       x = "Age Category / Race",
+       y = "Rate") +
+  scale_x_discrete(labels = function(x) gsub("\\.", "-", x)) +  
+  scale_color_viridis_b() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+print(teen_birth2)
+print(teen_birth)
+```
+The data is completely different in the scrambled set than the original. All of these changes are to be expected as we scrambled the dataset to create synthetic data instead of replicating it. 
