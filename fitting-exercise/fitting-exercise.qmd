@@ -12,6 +12,7 @@ library(tidyverse)
 library(ggplot2)
 library(yardstick)
 library(pROC)
+library(caret)
 ```
 
 Importing the Mavoglurant dataset from this [GitHub repository](https://github.com/metrumresearchgroup/BayesPBPK-tutorial/blob/master/data/Mavoglurant_A2121_nmpk.csv)
@@ -24,7 +25,7 @@ mavoglurant <- read.csv("~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fit
 
 ```{r}
 # Summary table of the data prior to any mutation or cleaning 
-print(summary(mavoglurant))
+summary(mavoglurant)
 ```
 
   
@@ -52,18 +53,15 @@ strat_mavo <- mavoglurant %>%
 Filtering the data set to only include non zero values for TIME, computing the sum of DV and assigning it to variable Y, 
 
 ```{r}
-# Exclude observations with TIME = 0
-filtered_mavo <- strat_mavo %>%
-  filter(TIME != 0)
-
-# Compute the sum of DV variable for each individual
-summarized_mavo <- filtered_mavo %>%
+# Compute the sum of DV variable for each individual (# total drug as a sum)
+summarized_mavo <- strat_mavo %>%
+  filter(AMT == "0") %>%
   group_by(ID) %>%
-  summarize(Y = sum(DV))
+  dplyr::summarize(Y = sum(DV))
 
 # Create a data frame with observations where TIME == 0
 time_zero_data <- strat_mavo %>%
-  filter(TIME == 0)
+  filter(TIME == "0")
 
 # Join the summarized data with the data at time zero
 joined_mavo <- left_join(summarized_mavo, time_zero_data, by = "ID")
@@ -76,19 +74,16 @@ Converting RACE and SEX variables to factor variables and only including necessa
 
 ```{r}
 # Convert RACE and SEX to factor variables
-joined_mavo <- joined_mavo %>%
-  mutate(RACE = factor(RACE),
-         SEX = factor(SEX))
-
-# Keep only the desired variables
-joined_mavo <- joined_mavo %>%
-  select(Y, DOSE, AGE, SEX, RACE, WT, HT)
+final_data <- joined_mavo %>% 
+  select(Y,DOSE,AGE,SEX,RACE,WT,HT) %>% 
+  mutate(across(c(SEX, RACE), as.factor)) 
+readr::write_rds(final_data,"mavoglurant.rds")
 
 # View the first few rows of the joined data set
-head(joined_mavo)
+head(final_data)
 
 # Summary Table of joined_mavo 
-print(summary(joined_mavo))
+print(summary(final_data))
 ```
 
 Now it's time to create some figures and tables to explore the new joined data set, joined_mavo. Since a codebook was not provided, I am going to create some plots to try to assume which values of SEX (1 or 2) correlate with Male and Female.
@@ -140,8 +135,10 @@ Now we are going to move onto model fitting. Please note that I had trouble usin
 Fitting a linear model to the continuous outcome (Y) using the main predictor of interest, DOSE.
 
 ```{r}
+lin_mod <- linear_reg() %>% set_engine("lm")
+
 # Fit a linear model
-y_dose_model <- lm(Y ~ DOSE, data = joined_mavo)
+y_dose_model <- lin_mod %>% fit(Y ~ DOSE, data = final_data)
 
 # Summarize the model
 tidy(y_dose_model)
@@ -151,7 +148,7 @@ Fitting a linear model to Y using all predictors
 
 ```{r}
 # Fit a linear model using all predictors
-y_all_model <- lm(Y ~ ., data = joined_mavo)
+y_all_model <- lin_mod %>% fit(Y ~ ., data = final_data)
 
 # Summarize the model
 tidy(y_all_model)
@@ -162,30 +159,13 @@ Calculating RMSE and R-Squared values for both models, y_dose_model & y_all_mode
 ```{r}
 ### y_dose_model calculations 
 
-#Calculating predictions for y_dose_model 
+# Compute the RMSE and R squared for model 1
+metrics_3 <- y_dose_model %>% 
+  predict(final_data) %>% 
+  bind_cols(final_data) %>% 
+  metrics(truth = Y, estimate = .pred)
 
-preds_dose <- predict(y_dose_model, newdata = joined_mavo)
-
-#Creating dataframe of original values of Y and predictions
-preds_dose_data <- bind_cols(preds_dose, joined_mavo$Y) %>%
-  rename(Y = "...2")
-
-
-## Compute RMSE for y_dose_model
-
-# Calculate residuals
-residuals <- preds_dose - joined_mavo$Y
-
-# Compute RMSE
-rmse <- sqrt(mean(residuals^2))
-
-# Compute R-squared
-r_squared <- 1 - sum(residuals^2) / sum((joined_mavo$Y - mean(joined_mavo$Y))^2)
-
-# Print RMSE and R-squared
-cat("RMSE:", rmse, "\n")
-cat("R-squared:", r_squared, "\n")
-
+print(metrics_3)
 ```
 The RMSE value of 666 could indicate large amounts of error or poor model performance. The R-squared value of 0.51 (~51%) could also indicate poorer model performance as we would like to maximize R-squared. 
 
@@ -193,29 +173,14 @@ The RMSE value of 666 could indicate large amounts of error or poor model perfor
 ```{r}
 ### y_all_model calculations
 
-#Calculating predictions for y_all_model 
+# Compute the RMSE and R squared for model 2
+metrics_4 <- y_all_model %>% 
+  predict(final_data) %>% 
+  bind_cols(final_data) %>% 
+  metrics(truth = Y, estimate = .pred)
 
-preds_all <- predict(y_all_model, newdata = joined_mavo)
-
-#Creating dataframe of original values of Y and predictions
-preds_all_data <- bind_cols(preds_all, joined_mavo$Y) %>%
-  rename(Y = "...2")
-
-
-## Compute RMSE for y_dose_model
-
-# Calculate residuals
-residuals2 <- preds_all - joined_mavo$Y
-
-# Compute RMSE
-rmse2 <- sqrt(mean(residuals2^2))
-
-# Compute R-squared
-r_squared2 <- 1 - sum(residuals2^2) / sum((joined_mavo$Y - mean(joined_mavo$Y))^2)
-
-# Print RMSE and R-squared
-cat("RMSE:", rmse2, "\n")
-cat("R-squared:", r_squared2, "\n")
+# Print the results
+print(metrics_4)
 ```
 This model performed better than the previous model. Our RMSE is lower (590) and our R-squared is higher at 0.619 (~62%). 
 
@@ -223,8 +188,10 @@ This model performed better than the previous model. Our RMSE is lower (590) and
 Now we are going to move on to logistic models for the binary outcome (SEX) using DOSE as the main predictor of interest. 
 
 ```{r}
+log_mod <- logistic_reg() %>% set_engine("glm")
+
 #Fit a logistic model to  SEX using the main predictor of interest,DOSE.
-logit_sex_model <- glm(SEX ~ DOSE, data = joined_mavo, family = binomial)
+logit_sex_model <- log_mod %>% fit(SEX ~ DOSE, data = final_data)
 
 # Summarize the model
 tidy(logit_sex_model)
@@ -233,7 +200,7 @@ Now I am going to fit a logistic model to sex using all predictors
 
 ```{r}
 # Fit logistic model with all predictors
-logit_model_all <- glm(SEX ~ ., data = joined_mavo, family = binomial)
+logit_model_all <- log_mod %>% fit(SEX ~ ., data = final_data)
 
 # Summarize the model
 tidy(logit_model_all)
@@ -242,31 +209,20 @@ tidy(logit_model_all)
 Computing ROC-AUC and accuracy for logit_sex_model 
 
 ```{r}
-##ACCURACY 
+# Compute the accuracy and AUC for model 1
 
-# Predict SEX using the logistic model with only DOSE as a predictor
-predsdose <- predict(logit_sex_model, type = "response")
+m1_acc <- logit_sex_model %>% 
+  predict(final_data) %>% 
+  bind_cols(final_data) %>% 
+  metrics(truth = SEX, estimate = .pred_class) %>% 
+  filter(.metric == "accuracy") 
+m1_auc <-  logit_sex_model %>%
+  predict(final_data, type = "prob") %>%
+  bind_cols(final_data) %>%
+  roc_auc(truth = SEX, .pred_1)
 
-# Convert predicted probabilities to binary predictions (0 or 1)
-preds_dose_binary <- ifelse(predsdose > 0.5, 1, 0)
-
-# Compute accuracy
-accuracy <- mean(preds_dose_binary == joined_mavo$SEX)
-
-# Print accuracy
-cat("Accuracy:", accuracy, "\n")
-
-##ROC-AUC 
-
-# Compute ROC-AUC for the logistic model with only DOSE as a predictor
-roc_auc <- roc(joined_mavo$SEX, predict(logit_sex_model, type = "response"))
-
-# Calculate AUC
-auc <- auc(roc_auc)
-
-# Print ROC-AUC
-cat("ROC-AUC for the logistic model with only DOSE as a predictor:", auc, "\n")
-
+print(m1_acc)
+print(m1_auc)
 ```
 An accuracy of 0 indicates that the model's predictions did not match any of the observed values in the data. A ROC-AUC value of 0.59 is not particularly great as it could suggest that the model's predictions are not far off from what could be considered random chance. 
 
@@ -274,29 +230,204 @@ An accuracy of 0 indicates that the model's predictions did not match any of the
 Computing ROC-AUC and accuracy for logit_model_all
 
 ```{r}
-##ACCURACY
+# Compute the accuracy and AUC for model 2
+m2_acc <- logit_model_all %>% 
+  predict(final_data) %>% 
+  bind_cols(final_data) %>% 
+  metrics(truth = SEX, estimate = .pred_class) %>% 
+  filter(.metric %in% c("accuracy"))
+m2_auc <-  logit_model_all %>%
+  predict(final_data, type = "prob") %>%
+  bind_cols(final_data) %>%
+  roc_auc(truth = SEX, .pred_1)
 
-# Predict SEX using the logistic model with all predictors
-preds_sex <- predict(logit_model_all, type = "response")
-
-# Convert predicted probabilities to binary predictions (0 or 1)
-preds_binary_sex <- ifelse(preds_sex > 0.5, 1, 0)
-
-# Compute accuracy
-accuracy2 <- mean(preds_binary_sex == joined_mavo$SEX)
-
-# Print accuracy
-cat("Accuracy:", accuracy2, "\n")
-
-##ROC-AUC
-
-# Compute ROC-AUC for the logistic model with only DOSE as a predictor
-roc_auc2 <- roc(joined_mavo$SEX, predict(logit_model_all, type = "response"))
-
-# Calculate AUC
-auc2 <- auc(roc_auc2)
-
-# Print ROC-AUC
-cat("ROC-AUC for the logistic model with only DOSE as a predictor:", auc2, "\n")
+print(m2_acc)
+print(m2_auc)
 ```
 An accuracy level of 0.025 suggests that the model is only "correct" in its predictions for 2.5% of observations. However, this model produced a very high and favorable ROC-AUC value of 0.9795 indicating a strong predictive performance in distinguishing between the two outcomes of the binary variable. 
+
+FITTING EXERCISE PART 2
+
+Setting a seed 
+```{r}
+rngseed = 1234
+```
+
+Removing the RACE variable
+```{r}
+updated <- final_data %>%
+  select(Y, DOSE, AGE, SEX, WT, HT)
+```
+
+Calling the seed 
+```{r}
+set.seed(rngseed)
+```
+
+Splitting the data 75/25 into train & test data frames
+```{r}
+# Put 3/4 of the data into the training set 
+data_split <- initial_split(updated, prop = 3/4)
+
+# Create data frames for the two sets:
+train_data <- training(data_split)
+test_data  <- testing(data_split)
+```
+
+
+Fitting two linear models to continuous outcome of interest, Y
+```{r}
+# Fit a linear model using DOSE as predictor
+train1 <- lin_mod %>% fit(Y ~ DOSE, data = train_data)
+
+# Fit a linear model using all predictors 
+train2 <- lin_mod %>% fit(Y ~ ., data = train_data)
+```
+
+Computing predictions for both models & then use observed and predicted values to compute RMSE of the best-fitting model.
+
+```{r}
+train_metrics1 <- train1 %>% 
+  predict(train_data) %>% 
+  bind_cols(train_data) %>% 
+  metrics(truth = Y, estimate = .pred)
+#RMSE --> 702.807
+
+train_metrics2 <- train2  %>% 
+  predict(train_data) %>% 
+  bind_cols(train_data) %>% 
+  metrics(truth = Y, estimate = .pred)
+#RMSE --> 627.440 
+
+print(train_metrics1)
+print(train_metrics2)
+```
+The second model (all variables as predictors) performed better than the first model (DOSE as predictor). 
+
+
+Fitting null model
+
+```{r}
+
+# Define the null model using the parsnip engine
+null_spec <- null_model() %>%
+  set_engine("parsnip") %>%
+  set_mode("regression")
+
+# Fit the null model using the training data
+fitted_null <- fit(null_spec, formula = Y ~ 1, data = train_data) 
+
+# Make predictions using the null model on the testing data
+null_predictions <- predict(fitted_null, train_data) %>%
+  select(.pred)
+
+# Calculate the RMSE for the null model
+rmse_null <- sqrt(mean((train_data$Y - null_predictions$.pred)^2))
+
+# Print the RMSE for the null model
+cat("RMSE (Null model):", rmse_null, "\n")
+
+#RMSE --> 948
+```
+
+Resetting the seed prior to CV calculations 
+
+```{r}
+rngseed = 1234
+set.seed(rngseed)
+```
+
+Performing 10-fold cross validation
+
+```{r}
+# Define CV & K = 10 folds
+control <- trainControl(method = "cv", number = 10)
+
+# Model 1 Fit -> DOSE as predictor
+
+cv1 <- train(Y ~ DOSE, data = train_data, method = "lm", trControl = control)
+print(cv1)
+##RMSE --> 697
+# Model 2 Fit -> All variables as predictor
+
+cv2 <- train(Y ~ ., data = train_data, method = "lm", trControl = control)
+print(cv2)
+##RMSE --> 644
+```
+The second model (using all variables as  predictors) performed slightly better than the first model (DOSE as predictor). 
+
+I am now going to perform the cross-validation folds again using a different seed. 
+
+```{r}
+rngseed = 3654
+set.seed(3654)
+
+# Splitting the data 
+
+split <- initial_split(updated, prop = 3/4)
+data_train <- training(split)
+data_test <- testing(split)
+
+# Model fit using DOSE as predictor 
+
+lin_mod <- linear_reg() %>%
+  set_engine("lm")
+
+fit1 <- lin_mod %>%
+  fit(Y ~ DOSE, data = data_train)
+
+tidy(fit1)
+
+# RMSE for Fit 1
+
+met1 <- fit1 %>% 
+  predict(data_train) %>% 
+  bind_cols(data_train) %>% 
+  metrics(truth = Y, estimate = .pred)
+
+# Model fit using all variables as predictors
+
+lin_mod <- linear_reg() %>%
+  set_engine("lm")
+
+fit2 <- lin_mod %>% 
+  fit(Y ~., data = data_train)
+
+tidy(fit2)
+
+# RMSE for Fit 2
+
+met2 <- fit2 %>% 
+  predict(data_train) %>% 
+  bind_cols(data_train) %>% 
+  metrics(truth = Y, estimate = .pred)
+
+
+# Print Results
+
+print(met1)
+print(met2)
+```
+Once again the second model performed better (RMSE = 533) than the first model (RMSE = 623).
+
+Performing Cross-Validation Again
+
+```{r}
+# Defining train control method & number of folds
+control2 <- trainControl(method = "cv", number = 10)
+
+# DOSE Model
+
+mod1 <- train(Y ~ DOSE, data = data_train, method = "lm", trControl = control2)
+
+# All Variables Model
+
+mod2 <- train(Y ~ ., data = data_train, method = "lm", trControl = control2)
+
+# Printing RMSE results
+
+print(mod1) #619
+print(mod2) #561
+
+```
+Using a different seed yielded similar results. The second model including all variables as predictors performed better than the first model only using DOSE as a predictor (RMSE = 619 vs. RMSE = 561). 
