@@ -284,10 +284,10 @@ test_data  <- testing(data_split)
 Fitting two linear models to continuous outcome of interest, Y
 
 ```{r}
-# Fit a linear model using DOSE as predictor
+# Fit a linear model using DOSE as predictor using training data
 train1 <- lin_mod %>% fit(Y ~ DOSE, data = train_data)
 
-# Fit a linear model using all predictors 
+# Fit a linear model using all predictors using training data
 train2 <- lin_mod %>% fit(Y ~ ., data = train_data)
 ```
 
@@ -588,3 +588,52 @@ ggplot(fig_data, aes(x = observed, y = points)) +
 The data points in the scatter plot are clustered around the line of perfect fit, which suggests that the model's predictions are generally accurate. However, there are also some data points that deviate from the line, indicating that the model's predictions are not always perfect.
 
 There seems to be a trend where the data points become more scattered as the observed values increase. This suggests that the model may be less accurate at predicting higher observed values.
+
+Part 3: Final Model evaluation using test data 
+
+```{r}
+# Create linear regression model specification
+lin_mod <- linear_reg() %>% set_engine("lm")
+
+# Fit the model to the training data
+train2 <- lin_mod %>% fit(Y ~ ., data = train_data)
+model2pred <- predict(train2, new_data = train_data)
+
+# Use the fitted model to make predictions for the test data
+test_predictions <- predict(train2, new_data = test_data)
+
+#Dataframe with observed and predicted values, along with model labels
+test_train_df <- data.frame(
+  observed = c(train_data$Y), 
+  model2pred = c(model2pred$.pred),  # Predicted values for Model 2 on train
+  test_predictions = c(test_predictions$.pred),     # Predicted values for model 2 on test
+  model = rep(c("Train Model 2", "Test Model 2"), each = nrow(train_data)))  
+head(test_train_df)
+
+
+# Filter the data frame for training and test data
+train_df <- test_train_df[test_train_df$model == "Train Model 2", ]
+test_df <- test_train_df[test_train_df$model == "Test Model 2", ]
+
+# Create the plot
+test_v_train <- ggplot() +
+  geom_point(data = train_df, aes(x = observed, y = model2pred, color = "Training", shape = "Training"), alpha = 0.5) +
+  geom_point(data = test_df, aes(x = observed, y = test_predictions, color = "Test", shape = "Test"), alpha = 0.5) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+  labs(
+    x = "Observed",
+    y = "Predicted",
+    title = "Predicted vs Observed",
+    color = "Model",
+    shape = "Model"
+  ) +
+  scale_color_manual(values = c("Training" = "blue", "Test" = "red")) +
+  scale_shape_manual(values = c("Training" = 16, "Test" = 17)) +
+  theme_minimal()
+test_v_train
+
+```
+
+This plot shows that most test points were mixed in with training points; however, we can see evidence of over fitting to the training data. Model 1 includes only the dose as a predictor and performed better than the null model, indicating that dose alone has more predictive power for the outcome variable, Y. We can observe this by comparing the RMSE values calculated previously. Model 2 further performed better than the null model and model 1, indicating that all predictors contribute significantly to explaining the variability of the outcome, Y. I would not consider model 1 to be useful for any real purpose as the RMSE was still considerably "high" and only using one predictor is not representative of the data itself. I would consider Model 2 to be relatively "usable", however, it didn't provide an overly stellar performance. Model 2's inclusion of all predictors increases its ability to explain the variability in the outcome, Y and had a lower RMSE than both the null model and model 1. 
+
+

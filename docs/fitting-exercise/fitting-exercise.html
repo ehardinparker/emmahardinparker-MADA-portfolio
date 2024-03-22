@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.540">
+<meta name="generator" content="quarto-1.4.537">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -645,10 +645,10 @@ The following aesthetics were dropped during statistical transformation: fill
 </div>
 <p>Fitting two linear models to continuous outcome of interest, Y</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit a linear model using DOSE as predictor</span></span>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit a linear model using DOSE as predictor using training data</span></span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>train1 <span class="ot">&lt;-</span> lin_mod <span class="sc">%&gt;%</span> <span class="fu">fit</span>(Y <span class="sc">~</span> DOSE, <span class="at">data =</span> train_data)</span>
 <span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit a linear model using all predictors </span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit a linear model using all predictors using training data</span></span>
 <span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>train2 <span class="ot">&lt;-</span> lin_mod <span class="sc">%&gt;%</span> <span class="fu">fit</span>(Y <span class="sc">~</span> ., <span class="at">data =</span> train_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Computing predictions for both models &amp; then use observed and predicted values to compute RMSE of the best-fitting model.</p>
@@ -1101,6 +1101,63 @@ Removed 1 rows containing missing values (`geom_point()`).</code></pre>
 </div>
 <p>The data points in the scatter plot are clustered around the line of perfect fit, which suggests that the model’s predictions are generally accurate. However, there are also some data points that deviate from the line, indicating that the model’s predictions are not always perfect.</p>
 <p>There seems to be a trend where the data points become more scattered as the observed values increase. This suggests that the model may be less accurate at predicting higher observed values.</p>
+<p>Part 3: Final Model evaluation using test data</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create linear regression model specification</span></span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>lin_mod <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span> <span class="fu">set_engine</span>(<span class="st">"lm"</span>)</span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model to the training data</span></span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>train2 <span class="ot">&lt;-</span> lin_mod <span class="sc">%&gt;%</span> <span class="fu">fit</span>(Y <span class="sc">~</span> ., <span class="at">data =</span> train_data)</span>
+<span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a>model2pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(train2, <span class="at">new_data =</span> train_data)</span>
+<span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb84-8"><a href="#cb84-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the fitted model to make predictions for the test data</span></span>
+<span id="cb84-9"><a href="#cb84-9" aria-hidden="true" tabindex="-1"></a>test_predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(train2, <span class="at">new_data =</span> test_data)</span>
+<span id="cb84-10"><a href="#cb84-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb84-11"><a href="#cb84-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Dataframe with observed and predicted values, along with model labels</span></span>
+<span id="cb84-12"><a href="#cb84-12" aria-hidden="true" tabindex="-1"></a>test_train_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb84-13"><a href="#cb84-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">observed =</span> <span class="fu">c</span>(train_data<span class="sc">$</span>Y), </span>
+<span id="cb84-14"><a href="#cb84-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">model2pred =</span> <span class="fu">c</span>(model2pred<span class="sc">$</span>.pred),  <span class="co"># Predicted values for Model 2 on train</span></span>
+<span id="cb84-15"><a href="#cb84-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">test_predictions =</span> <span class="fu">c</span>(test_predictions<span class="sc">$</span>.pred),     <span class="co"># Predicted values for model 2 on test</span></span>
+<span id="cb84-16"><a href="#cb84-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Train Model 2"</span>, <span class="st">"Test Model 2"</span>), <span class="at">each =</span> <span class="fu">nrow</span>(train_data)))  </span>
+<span id="cb84-17"><a href="#cb84-17" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(test_train_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  observed model2pred test_predictions         model
+1  3004.21   3303.028         1871.407 Train Model 2
+2  1346.62   1952.556         2664.857 Train Model 2
+3  2771.69   2744.878         2357.237 Train Model 2
+4  2027.60   2081.182         2954.489 Train Model 2
+5  2353.40   2894.205         2100.673 Train Model 2
+6   826.43   1264.763         3479.345 Train Model 2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter the data frame for training and test data</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>train_df <span class="ot">&lt;-</span> test_train_df[test_train_df<span class="sc">$</span>model <span class="sc">==</span> <span class="st">"Train Model 2"</span>, ]</span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>test_df <span class="ot">&lt;-</span> test_train_df[test_train_df<span class="sc">$</span>model <span class="sc">==</span> <span class="st">"Test Model 2"</span>, ]</span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the plot</span></span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>test_v_train <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> train_df, <span class="fu">aes</span>(<span class="at">x =</span> observed, <span class="at">y =</span> model2pred, <span class="at">color =</span> <span class="st">"Training"</span>, <span class="at">shape =</span> <span class="st">"Training"</span>), <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> test_df, <span class="fu">aes</span>(<span class="at">x =</span> observed, <span class="at">y =</span> test_predictions, <span class="at">color =</span> <span class="st">"Test"</span>, <span class="at">shape =</span> <span class="st">"Test"</span>), <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb86-10"><a href="#cb86-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb86-11"><a href="#cb86-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Observed"</span>,</span>
+<span id="cb86-12"><a href="#cb86-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Predicted"</span>,</span>
+<span id="cb86-13"><a href="#cb86-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Predicted vs Observed"</span>,</span>
+<span id="cb86-14"><a href="#cb86-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Model"</span>,</span>
+<span id="cb86-15"><a href="#cb86-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape =</span> <span class="st">"Model"</span></span>
+<span id="cb86-16"><a href="#cb86-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb86-17"><a href="#cb86-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Training"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"Test"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb86-18"><a href="#cb86-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Training"</span> <span class="ot">=</span> <span class="dv">16</span>, <span class="st">"Test"</span> <span class="ot">=</span> <span class="dv">17</span>)) <span class="sc">+</span></span>
+<span id="cb86-19"><a href="#cb86-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb86-20"><a href="#cb86-20" aria-hidden="true" tabindex="-1"></a>test_v_train</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="fitting-exercise_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This plot shows that most test points were mixed in with training points; however, we can see evidence of over fitting to the training data. Model 1 includes only the dose as a predictor and performed better than the null model, indicating that dose alone has more predictive power for the outcome variable, Y. We can observe this by comparing the RMSE values calculated previously. Model 2 further performed better than the null model and model 1, indicating that all predictors contribute significantly to explaining the variability of the outcome, Y. I would not consider model 1 to be useful for any real purpose as the RMSE was still considerably “high” and only using one predictor is not representative of the data itself. I would consider Model 2 to be relatively “usable”, however, it didn’t provide an overly stellar performance. Model 2’s inclusion of all predictors increases its ability to explain the variability in the outcome, Y and had a lower RMSE than both the null model and model 1.</p>
 
 
 </section>
