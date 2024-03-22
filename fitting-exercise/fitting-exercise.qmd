@@ -4,7 +4,7 @@ author: "Emma Hardin-Parker"
 date: "02/27/2024"
 ---
 
-Loading necessary packages 
+Loading necessary packages
 
 ```{r message=FALSE}
 library(tidymodels)
@@ -18,18 +18,21 @@ library(caret)
 Importing the Mavoglurant dataset from this [GitHub repository](https://github.com/metrumresearchgroup/BayesPBPK-tutorial/blob/master/data/Mavoglurant_A2121_nmpk.csv)
 
 ```{r}
-mavoglurant <- read.csv("~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise/Mavoglurant_A2121_nmpk.csv")
+data_location <- here::here("fitting-exercise", "Mavoglurant_A2121_nmpk.csv")
+
+# Reading the CSV file into a data frame
+mavoglurant <- readr::read_csv(data_location)
+
 ```
 
-### Exploratory Data Analysis of the Mavoglurant data set 
+### Exploratory Data Analysis of the Mavoglurant data set
 
 ```{r}
 # Summary table of the data prior to any mutation or cleaning 
 summary(mavoglurant)
 ```
 
-  
-Plotting the outcome variable (DV) as a function of time, stratified by DOSE, and grouped by ID 
+Plotting the outcome variable (DV) as a function of time, stratified by DOSE, and grouped by ID
 
 ```{r}
 # Plot DV vs. time, stratified by DOSE and grouped by ID
@@ -42,15 +45,14 @@ dv_dose <- ggplot(mavoglurant, aes(x = TIME, y = DV, group = ID, color = DOSE)) 
 print(dv_dose)
 ```
 
-
-Filtering the data set to only include OCC = 1 observations 
+Filtering the data set to only include OCC = 1 observations
 
 ```{r}
 strat_mavo <- mavoglurant %>%
   filter(OCC == "1")
 ```
 
-Filtering the data set to only include non zero values for TIME, computing the sum of DV and assigning it to variable Y, 
+Filtering the data set to only include non zero values for TIME, computing the sum of DV and assigning it to variable Y,
 
 ```{r}
 # Compute the sum of DV variable for each individual (# total drug as a sum)
@@ -111,10 +113,9 @@ print(sex_wt)
 
 ```
 
-As we can see from the plot exploring the relationship between sex and dose, the sex assigned the value 1 had much higher doses on average than the sex assigned the value 2. When exploring the relationship between sex and weight, we can see that sex assigned the value 1 weighs considerably more on average than the sex assigned value 2. From these plots I can comfortably assume that SEX = 1 corresponds to Male and SEX = 2 corresponds to female. 
+As we can see from the plot exploring the relationship between sex and dose, the sex assigned the value 1 had much higher doses on average than the sex assigned the value 2. When exploring the relationship between sex and weight, we can see that sex assigned the value 1 weighs considerably more on average than the sex assigned value 2. From these plots I can comfortably assume that SEX = 1 corresponds to Male and SEX = 2 corresponds to female.
 
-
-Creating plots to determine a relationship between AGE and Y. 
+Creating plots to determine a relationship between AGE and Y.
 
 ```{r}
 y_age <- ggplot(joined_mavo, aes(x = AGE, y = Y)) +
@@ -124,13 +125,12 @@ y_age <- ggplot(joined_mavo, aes(x = AGE, y = Y)) +
   theme_minimal()
 print(y_age)
 ```
-From this plot we can see no discernible relationship between the outcome variable Y and Age. 
 
+From this plot we can see no discernible relationship between the outcome variable Y and Age.
 
 ### Model Fitting
 
-Now we are going to move onto model fitting. Please note that I had trouble using the rmse() function due to strange errors so I had to rework the coding process to calculate the RMSE and R-squared values. I also elected to use the pROC package to help me compute ROC-AUC values for the logistic models. 
-
+Now we are going to move onto model fitting. Please note that I had trouble using the rmse() function due to strange errors so I had to rework the coding process to calculate the RMSE and R-squared values. I also elected to use the pROC package to help me compute ROC-AUC values for the logistic models.
 
 Fitting a linear model to the continuous outcome (Y) using the main predictor of interest, DOSE.
 
@@ -154,7 +154,7 @@ y_all_model <- lin_mod %>% fit(Y ~ ., data = final_data)
 tidy(y_all_model)
 ```
 
-Calculating RMSE and R-Squared values for both models, y_dose_model & y_all_model. 
+Calculating RMSE and R-Squared values for both models, y_dose_model & y_all_model.
 
 ```{r}
 ### y_dose_model calculations 
@@ -167,8 +167,8 @@ metrics_3 <- y_dose_model %>%
 
 print(metrics_3)
 ```
-The RMSE value of 666 could indicate large amounts of error or poor model performance. The R-squared value of 0.51 (~51%) could also indicate poorer model performance as we would like to maximize R-squared. 
 
+The RMSE value of 666 could indicate large amounts of error or poor model performance. The R-squared value of 0.51 (\~51%) could also indicate poorer model performance as we would like to maximize R-squared.
 
 ```{r}
 ### y_all_model calculations
@@ -182,10 +182,10 @@ metrics_4 <- y_all_model %>%
 # Print the results
 print(metrics_4)
 ```
-This model performed better than the previous model. Our RMSE is lower (590) and our R-squared is higher at 0.619 (~62%). 
 
+This model performed better than the previous model. Our RMSE is lower (590) and our R-squared is higher at 0.619 (\~62%).
 
-Now we are going to move on to logistic models for the binary outcome (SEX) using DOSE as the main predictor of interest. 
+Now we are going to move on to logistic models for the binary outcome (SEX) using DOSE as the main predictor of interest.
 
 ```{r}
 log_mod <- logistic_reg() %>% set_engine("glm")
@@ -196,7 +196,8 @@ logit_sex_model <- log_mod %>% fit(SEX ~ DOSE, data = final_data)
 # Summarize the model
 tidy(logit_sex_model)
 ```
-Now I am going to fit a logistic model to sex using all predictors 
+
+Now I am going to fit a logistic model to sex using all predictors
 
 ```{r}
 # Fit logistic model with all predictors
@@ -206,7 +207,8 @@ logit_model_all <- log_mod %>% fit(SEX ~ ., data = final_data)
 tidy(logit_model_all)
 
 ```
-Computing ROC-AUC and accuracy for logit_sex_model 
+
+Computing ROC-AUC and accuracy for logit_sex_model
 
 ```{r}
 # Compute the accuracy and AUC for model 1
@@ -224,8 +226,8 @@ m1_auc <-  logit_sex_model %>%
 print(m1_acc)
 print(m1_auc)
 ```
-An accuracy of 0 indicates that the model's predictions did not match any of the observed values in the data. A ROC-AUC value of 0.59 is not particularly great as it could suggest that the model's predictions are not far off from what could be considered random chance. 
 
+An accuracy of 0 indicates that the model's predictions did not match any of the observed values in the data. A ROC-AUC value of 0.59 is not particularly great as it could suggest that the model's predictions are not far off from what could be considered random chance.
 
 Computing ROC-AUC and accuracy for logit_model_all
 
@@ -244,27 +246,32 @@ m2_auc <-  logit_model_all %>%
 print(m2_acc)
 print(m2_auc)
 ```
-An accuracy level of 0.025 suggests that the model is only "correct" in its predictions for 2.5% of observations. However, this model produced a very high and favorable ROC-AUC value of 0.9795 indicating a strong predictive performance in distinguishing between the two outcomes of the binary variable. 
+
+An accuracy level of 0.025 suggests that the model is only "correct" in its predictions for 2.5% of observations. However, this model produced a very high and favorable ROC-AUC value of 0.9795 indicating a strong predictive performance in distinguishing between the two outcomes of the binary variable.
 
 FITTING EXERCISE PART 2
 
-Setting a seed 
+Setting a seed
+
 ```{r}
 rngseed = 1234
 ```
 
 Removing the RACE variable
+
 ```{r}
 updated <- final_data %>%
   select(Y, DOSE, AGE, SEX, WT, HT)
 ```
 
-Calling the seed 
+Calling the seed
+
 ```{r}
 set.seed(rngseed)
 ```
 
 Splitting the data 75/25 into train & test data frames
+
 ```{r}
 # Put 3/4 of the data into the training set 
 data_split <- initial_split(updated, prop = 3/4)
@@ -274,8 +281,8 @@ train_data <- training(data_split)
 test_data  <- testing(data_split)
 ```
 
-
 Fitting two linear models to continuous outcome of interest, Y
+
 ```{r}
 # Fit a linear model using DOSE as predictor
 train1 <- lin_mod %>% fit(Y ~ DOSE, data = train_data)
@@ -302,8 +309,8 @@ train_metrics2 <- train2  %>%
 print(train_metrics1)
 print(train_metrics2)
 ```
-The second model (all variables as predictors) performed better than the first model (DOSE as predictor). 
 
+The second model (all variables as predictors) performed better than the first model (DOSE as predictor).
 
 Fitting null model
 
@@ -330,7 +337,7 @@ cat("RMSE (Null model):", rmse_null, "\n")
 #RMSE --> 948
 ```
 
-Resetting the seed prior to CV calculations 
+Resetting the seed prior to CV calculations
 
 ```{r}
 rngseed = 1234
@@ -354,9 +361,10 @@ cv2 <- train(Y ~ ., data = train_data, method = "lm", trControl = control)
 print(cv2)
 ##RMSE --> 644
 ```
-The second model (using all variables as  predictors) performed slightly better than the first model (DOSE as predictor). 
 
-I am now going to perform the cross-validation folds again using a different seed. 
+The second model (using all variables as predictors) performed slightly better than the first model (DOSE as predictor).
+
+I am now going to perform the cross-validation folds again using a different seed.
 
 ```{r}
 rngseed = 3654
@@ -408,6 +416,7 @@ met2 <- fit2 %>%
 print(met1)
 print(met2)
 ```
+
 Once again the second model performed better (RMSE = 533) than the first model (RMSE = 623).
 
 Performing Cross-Validation Again
@@ -430,4 +439,152 @@ print(mod1) #619
 print(mod2) #561
 
 ```
-Using a different seed yielded similar results. The second model including all variables as predictors performed better than the first model only using DOSE as a predictor (RMSE = 619 vs. RMSE = 561). 
+
+Using a different seed yielded similar results. The second model including all variables as predictors performed better than the first model only using DOSE as a predictor (RMSE = 619 vs. RMSE = 561).
+
+#### This Section was added by Patrick Kaggwa. 
+
+I will start by creating a data frame
+
+```{r}
+# set seed for reproducibility
+rngseed = 12345
+set.seed(rngseed)
+
+#creating the preditions for all models  
+pnull <- predict(fitted_null, train_data) %>%
+  select(.pred)
+ptrain1 <- predict(train1, train_data) %>%
+  select(.pred)
+ ptrain2<- predict(train2, train_data) %>%
+  select(.pred)
+
+# create data frame with the observed values and 3 sets of predicted values 
+# Assuming the required values are already stored in variables or objects
+
+#Dataframe with observed and predicted values, along with model labels
+newdataf <- data.frame(
+  observed = c(train_data$Y), 
+  p_null = c(pnull$.pred),  # Predicted values for null model
+  p_model1 = c(ptrain1$.pred),     # Predicted values for model 1
+  pr_model2 = c(ptrain2$.pred),     # Predicted values for model 2
+  model = rep(c("null model", "model 1", "model 2"), each = nrow(train_data)))  
+head(newdataf)
+
+```
+
+I will use the new data frame to create a visualization.
+
+```{r}
+
+# Create scatter plot
+plot <- ggplot(newdataf, aes(x = observed)) +
+  geom_point(aes(y = p_null, color = "Null Model"), shape = 1, size = 3) +  # Null model
+  geom_point(aes(y = p_model1, color = "Model 1"), shape = 2, size = 3) + # Model 1
+  geom_point(aes(y = pr_model2, color = "Model 2"), shape = 3, size = 3) + # Model 2
+  scale_color_manual(values = c("Null Model" = "red", "Model 1" = "green", "Model 2" = "blue")) + # Colors for different models
+  xlim(0, 5000) + # Set x-axis limits
+  ylim(0, 5000) + # Set y-axis limits
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "black") +  # Add 45-degree line
+  labs(x = "Observed Values", y = "Predicted Values") + # Labels for axes
+  theme_bw() +  # Use a black and white theme
+  theme(legend.position = "right",  # Move legend to the bottom
+        legend.title = element_blank(),  # Remove legend title
+        legend.text = element_text(size = 10))  # Adjust legend text size
+
+# Display the plot
+print(plot)
+
+
+```
+
+The null model's predictions are constant, while Model 1, with only the "DOSE" variable, yields three horizontal lines due to its discrete values. Model 2, incorporating all variables, offers the best predictions, showing scattered points that follow a pattern along the 45-degree line.
+
+To assess residual patterns, predicted values against residuals will be ploted. Residuals will be calculated as (predictedvalues - observed). Now I will create new dataframe for the predicted values and residuals.
+
+```{r}
+# create data frame with predictions and residuals for the full model (model2)
+res <- data.frame(
+  fpredicts = c(ptrain2$.pred), 
+  residuals = c(ptrain2$.pred - train_data$Y)) 
+head(res)
+```
+
+I will plot the new residual values to look for any patterns.
+
+```{r}
+# plot predictions versus residuals for model 2
+ggplot(res, aes(x= fpredicts, y=residuals)) + 
+  geom_point() + 
+  geom_abline(slope = 0, intercept = 0, color = "green", size = 1) + #add straight line at 0
+  ylim(-2000,2000) + #make sure y-axis goes the same amount in positive and negative direction
+  labs(x= "Predicted Values", y= "Residuals")
+```
+
+There's some residual pattern, in general there are more and higher negative values compared to positive ones. That could either be because we are missing important information, i.e. we need more variables. Or it could be that the model is too simple, for instance it could be that the outcome depends on some variable in a nonlinear way
+
+## Model predictions and uncertainty
+
+```{r}
+# set the seed for reproducibility
+rngseed = 12345
+set.seed(rngseed)
+
+# create 100 bootstraps with the training data
+bootstraps <- bootstraps(data = train_data, times = 100)
+
+# create empty vector to store predictions list 
+preds_bs <- vector("list", length = length(bootstraps))
+for (i in 1:length(bootstraps)) {# for-loop to fit the modelto make predictions of the bootstrap
+dat_sample <- analysis(bootstraps$splits[[i]])  
+# fitting the model using the created bootstrap dat_sample
+model <- lm(Y ~ DOSE + AGE + HT + WT + SEX, data = dat_sample) 
+
+#Recording the predictions 
+predictions <- predict(model, newdata = train_data) 
+preds_bs[[i]] <- predictions # store predictions in the empty vector
+}
+# bootstrap sample 
+sample <- analysis(bootstraps$splits[[i]])
+head(sample)
+```
+
+Now I have preditions stored, I will compute the mean and 95% confidence intervals.
+
+```{r}
+# I will create an array to store the predictions
+psamples <- length(preds_bs)
+pdatapoints <- length(preds_bs[[1]])  
+preds_array <- array(NA, dim = c(psamples, pdatapoints))
+
+# storing predictions from bootstrappping
+for (i in 1:psamples) {
+  preds_array[i,] <- unlist(preds_bs[[i]])
+}
+# finding the Mean and confidence intervals 
+preds <- preds_array %>% apply(2, quantile,  c(0.055, 0.5, 0.945)) %>% t()
+head(preds)
+```
+
+A figure that plots observed values on the x-axis, and point estimate (obtained from your original predictions on the training data), as well as median and the upper and lower bounds - obtained by the bootstrap sampling .
+
+```{r}
+# create a dataset for the figure
+fig_data <- data.frame(observed = c(train_data$Y), points = c(ptrain2$.pred),
+                        mean = preds[, 2], lower_bound = preds[, 1],upper_bound = preds[, 3]
+)
+
+# A plot of obeserved, preditions, mean, and confidence intervals
+ggplot(fig_data, aes(x = observed, y = points)) +
+  geom_point(color = "black") +  
+  geom_point(aes(y = mean), color = "green") + 
+  geom_errorbar(aes(ymin = lower_bound, ymax = upper_bound), width = 0.1, color = "blue") + 
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") +  # add 45 degree line
+  xlim(0, 5000) +
+  ylim(0, 5000) +
+  labs(x = "Observed Values", y = "Predicted Values")
+```
+
+The data points in the scatter plot are clustered around the line of perfect fit, which suggests that the model's predictions are generally accurate. However, there are also some data points that deviate from the line, indicating that the model's predictions are not always perfect.
+
+There seems to be a trend where the data points become more scattered as the observed values increase. This suggests that the model may be less accurate at predicting higher observed values.
