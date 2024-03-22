@@ -21,7 +21,11 @@ library(dplyr)
 Loading the data set from FiveThirtyEight 
 
 ```{r}
-trump_approval <- read.csv("~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/presentation-exercise/approval_polllist.csv")
+data_location <- here::here("presentation-exercise", "approval_polllist.csv")
+
+# Reading the CSV file into a data frame
+trump_approval <- readr::read_csv(data_location)
+
 View(trump_approval)
 ```
 
