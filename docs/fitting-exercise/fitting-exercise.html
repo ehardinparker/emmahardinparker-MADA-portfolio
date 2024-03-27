@@ -161,6 +161,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../fitting-exercise/fitting-exercise.html">
  <span class="dropdown-text">Model Fitting Exercise</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../ml-models-exercise/ml-models-exercise.html">
+ <span class="dropdown-text">Machine Learning</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -1158,6 +1162,28 @@ Removed 1 rows containing missing values (`geom_point()`).</code></pre>
 </div>
 </div>
 <p>This plot shows that most test points were mixed in with training points; however, we can see evidence of over fitting to the training data. Model 1 includes only the dose as a predictor and performed better than the null model, indicating that dose alone has more predictive power for the outcome variable, Y. We can observe this by comparing the RMSE values calculated previously. Model 2 further performed better than the null model and model 1, indicating that all predictors contribute significantly to explaining the variability of the outcome, Y. I would not consider model 1 to be useful for any real purpose as the RMSE was still considerably “high” and only using one predictor is not representative of the data itself. I would consider Model 2 to be relatively “usable”, however, it didn’t provide an overly stellar performance. Model 2’s inclusion of all predictors increases its ability to explain the variability in the outcome, Y and had a lower RMSE than both the null model and model 1.</p>
+<p>Saving the clean data set into an RDS file to then use in the ml-models-exercise.qmd file</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">getwd</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "/Users/emmahardinparker/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">"/Users/emmahardinparker/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise"</span>)</span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(final_data, <span class="at">file =</span> <span class="st">"/Users/emmahardinparker/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise/data_with_race.rds"</span>)</span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the source file path (current location of the RDS file)</span></span>
+<span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a>source_file <span class="ot">&lt;-</span> <span class="st">"/Users/emmahardinparker/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise/data_with_race.rds"</span></span>
+<span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-8"><a href="#cb89-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the destination folder where you want to copy the RDS file</span></span>
+<span id="cb89-9"><a href="#cb89-9" aria-hidden="true" tabindex="-1"></a>destination_folder <span class="ot">&lt;-</span> <span class="st">"/Users/emmahardinparker/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/ml-models-exercise/"</span></span>
+<span id="cb89-10"><a href="#cb89-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb89-11"><a href="#cb89-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Use file.copy() to copy the RDS file to the destination folder</span></span>
+<span id="cb89-12"><a href="#cb89-12" aria-hidden="true" tabindex="-1"></a><span class="fu">file.copy</span>(<span class="at">from =</span> source_file, <span class="at">to =</span> destination_folder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
 
 
 </section>

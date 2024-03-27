@@ -636,4 +636,26 @@ test_v_train
 
 This plot shows that most test points were mixed in with training points; however, we can see evidence of over fitting to the training data. Model 1 includes only the dose as a predictor and performed better than the null model, indicating that dose alone has more predictive power for the outcome variable, Y. We can observe this by comparing the RMSE values calculated previously. Model 2 further performed better than the null model and model 1, indicating that all predictors contribute significantly to explaining the variability of the outcome, Y. I would not consider model 1 to be useful for any real purpose as the RMSE was still considerably "high" and only using one predictor is not representative of the data itself. I would consider Model 2 to be relatively "usable", however, it didn't provide an overly stellar performance. Model 2's inclusion of all predictors increases its ability to explain the variability in the outcome, Y and had a lower RMSE than both the null model and model 1. 
 
+Saving the clean data set into an RDS file to then use in the ml-models-exercise.qmd file
+
+```{r}
+
+getwd()
+setwd("/Users/emmahardinparker/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise")
+
+saveRDS(final_data, file = "/Users/emmahardinparker/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise/data_with_race.rds")
+
+# Specify the source file path (current location of the RDS file)
+source_file <- "/Users/emmahardinparker/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise/data_with_race.rds"
+
+# Specify the destination folder where you want to copy the RDS file
+destination_folder <- "/Users/emmahardinparker/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/ml-models-exercise/"
+
+# Use file.copy() to copy the RDS file to the destination folder
+file.copy(from = source_file, to = destination_folder)
+
+
+```
+
+
 
