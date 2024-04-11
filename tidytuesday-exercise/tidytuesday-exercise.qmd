@@ -10,7 +10,7 @@ date: "04/11/2024"
 
 The data sets were accessed from the following [GitHub repository](https://github.com/rfordatascience/tidytuesday/tree/master/data/2024/2024-04-09), 
 
-```{r message = false}
+```{r message = FALSE}
 library(tidyverse)
 library(ggplot2)
 library(dplyr)
@@ -265,7 +265,7 @@ eclipse_annular_2023 <- eclipse_annular_2023 %>%
 # Calculate duration of annularity
 eclipse_annular_2023 <- eclipse_annular_2023 %>%
   mutate(
-    totality_duration = difftime(eclipse_4_time, eclipse_3_time, units = "secs")
+    duration_annularity = difftime(eclipse_4_time, eclipse_3_time, units = "secs")
   )
 
 # Calculate total eclipse duration
@@ -305,7 +305,7 @@ Similar to what we saw above, Texas had one of the highest durations of eclipse 
 # Create a summary table with mean annularity duration by state
 annular_sum_table <- eclipse_annular_2023 %>%
   group_by(state) %>%
-  summarize(mean_duration = mean(duration_annularity))
+  summarize(mean_duration = mean(eclipse_annular_2023$duration_annularity))
 
 # Create the gt table
 ann_sum <- annular_sum_table %>%
@@ -399,6 +399,10 @@ total_test <- testing(split_total)
 
 ### Model Selection
 ```{r}
+#Preprocessing Recipe
+preprocess_recipe <- recipe(total_eclipse_duration ~ lat + lon, data = total_train) %>%
+  step_scale(all_numeric(), -all_outcomes())
+
 # Model 1: Linear Regression
 linear_model <- linear_reg() %>%
   set_mode("regression") %>%
@@ -415,7 +419,7 @@ lasso_model <- linear_reg(penalty = 0.1, mixture = 1) %>%
 
 # LASSO workflow
 lasso_wf <- workflow() %>%
-  add_recipe(data_recipe) %>%
+  add_recipe(preprocess_recipe) %>%
   add_model(lasso_model)
 ```
 

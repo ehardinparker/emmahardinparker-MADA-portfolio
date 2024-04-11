@@ -6,6 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Emma Hardin-Parker">
+<meta name="dcterms.date" content="2024-04-11">
 
 <title>EMMA HARDIN-PARKER: DATA ANALYSIS PORTFOLIO - Tidy Tuesday Exercise</title>
 <style>
@@ -19,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -162,7 +198,19 @@ ul.task-list li input[type="checkbox"] {
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Emma Hardin-Parker </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 11, 2024</p>
+    </div>
+  </div>
   
     
   </div>
@@ -172,9 +220,1769 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Placeholder file for the future Tidy Tuesday exercise.</p>
+<section id="tidy-tuesday-exercise" class="level1">
+<h1>Tidy Tuesday Exercise</h1>
+<section id="loading-the-data-and-required-packages" class="level2">
+<h2 class="anchored" data-anchor-id="loading-the-data-and-required-packages">Loading the Data and Required Packages</h2>
+<p>The data sets were accessed from the following <a href="https://github.com/rfordatascience/tidytuesday/tree/master/data/2024/2024-04-09">GitHub repository</a>,</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(geosphere)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(yardstick)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>eclipse_total_2024 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/data/eclipse_total_2024.csv"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>eclipse_annular_2023 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/data/eclipse_annular_2023.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">Background</h2>
+<p>The ultimate goal is to perform EDA processes on both the eclipse_total_2024 and eclipse_annular_2023 datasets in hopes to formulate questions and hypotheses to drive machine learning and modeling analysis. I am using the EDA process for both datasets to help me determine which dataset I would like to focus on for the main machine learning model analysis.</p>
+</section>
+<section id="exploratory-data-analysis-of-eclipse_total_2024-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis-of-eclipse_total_2024-dataset">Exploratory Data Analysis of Eclipse_Total_2024 dataset</h2>
+<p>The data dictionary for the eclipse_total_2024 dataset is as follows:</p>
+<p>state: character 2-letter state abbreviation name: character city name lat: double latitude lon: double longitude eclipse_1: hms time at which the moon first contacts the sun in this location eclipse_2: hms time at which the eclipse is at 50% in this location eclipse_3: hms time at which totality begins in this location eclipse_4: hms time at which totality ends in this location eclipse_5: hms time at which the eclipse is back to 50% in this location eclipse_6: hms time at which the moon last contacts the sun in this location</p>
+<section id="eda-of-2024-totality-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="eda-of-2024-totality-dataset">EDA of 2024 Totality Dataset</h3>
+<p>I am going to create some exploratory tables and figures to get a better grip on the data before doing any further analysis.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(eclipse_total_2024)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   3330 obs. of  10 variables:
+ $ state    : chr  "AR" "AR" "AR" "AR" ...
+ $ name     : chr  "Acorn" "Adona" "Alexander" "Alicia" ...
+ $ lat      : num  34.6 35 34.6 35.9 35.4 ...
+ $ lon      : num  -94.2 -92.9 -92.5 -91.1 -93.7 ...
+ $ eclipse_1: chr  "17:30:40" "17:33:20" "17:33:20" "17:37:30" ...
+ $ eclipse_2: chr  "18:15:50" "18:18:30" "18:18:30" "18:22:40" ...
+ $ eclipse_3: chr  "18:47:35" "18:50:08" "18:51:09" "18:54:29" ...
+ $ eclipse_4: chr  "18:51:37" "18:54:22" "18:53:38" "18:58:05" ...
+ $ eclipse_5: chr  "19:23:40" "19:26:10" "19:26:20" "19:29:50" ...
+ $ eclipse_6: chr  "20:08:30" "20:10:50" "20:11:10" "20:14:10" ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(eclipse_total_2024)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    state               name                lat             lon         
+ Length:3330        Length:3330        Min.   :28.45   Min.   :-101.16  
+ Class :character   Class :character   1st Qu.:35.42   1st Qu.: -92.41  
+ Mode  :character   Mode  :character   Median :39.24   Median : -86.56  
+                                       Mean   :38.33   Mean   : -86.93  
+                                       3rd Qu.:41.22   3rd Qu.: -82.31  
+                                       Max.   :46.91   Max.   : -67.43  
+  eclipse_1          eclipse_2          eclipse_3          eclipse_4        
+ Length:3330        Length:3330        Length:3330        Length:3330       
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+  eclipse_5          eclipse_6        
+ Length:3330        Length:3330       
+ Class :character   Class :character  
+ Mode  :character   Mode  :character  
+                                      
+                                      
+                                      </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(eclipse_total_2024)) <span class="co"># No missing values </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+<p>Fortunately, there are no missing values so I can move on to more in-depth mutation of the data. This involves creating new varia les and mutating existing variables to make sure the data are prepared to be analyzed. I am also going to create a boxplot showing the total eclipse duration by state.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert hms columns to time format</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>eclipse_total_2024 <span class="ot">&lt;-</span> eclipse_total_2024 <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">eclipse_1_time =</span> <span class="fu">as.POSIXct</span>(eclipse_1, <span class="at">format =</span> <span class="st">"%H:%M:%S"</span>),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">eclipse_2_time =</span> <span class="fu">as.POSIXct</span>(eclipse_2, <span class="at">format =</span> <span class="st">"%H:%M:%S"</span>),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">eclipse_3_time =</span> <span class="fu">as.POSIXct</span>(eclipse_3, <span class="at">format =</span> <span class="st">"%H:%M:%S"</span>),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">eclipse_4_time =</span> <span class="fu">as.POSIXct</span>(eclipse_4, <span class="at">format =</span> <span class="st">"%H:%M:%S"</span>),</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">eclipse_5_time =</span> <span class="fu">as.POSIXct</span>(eclipse_5, <span class="at">format =</span> <span class="st">"%H:%M:%S"</span>),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">eclipse_6_time =</span> <span class="fu">as.POSIXct</span>(eclipse_6, <span class="at">format =</span> <span class="st">"%H:%M:%S"</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate duration of totality</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>eclipse_total_2024 <span class="ot">&lt;-</span> eclipse_total_2024 <span class="sc">%&gt;%</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">totality_duration =</span> <span class="fu">difftime</span>(eclipse_4_time, eclipse_3_time, <span class="at">units =</span> <span class="st">"secs"</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate total eclipse duration</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>eclipse_total_2024 <span class="ot">&lt;-</span> eclipse_total_2024 <span class="sc">%&gt;%</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_eclipse_duration =</span> <span class="fu">difftime</span>(eclipse_6_time, eclipse_1_time, <span class="at">units =</span> <span class="st">"secs"</span>)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary statistics for new variables</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(eclipse_total_2024<span class="sc">$</span>totality_duration)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Length    Class     Mode 
+    3330 difftime  numeric </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(eclipse_total_2024<span class="sc">$</span>total_eclipse_duration)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Length    Class     Mode 
+    3330 difftime  numeric </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom color palette</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>my_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#77AADD"</span>, <span class="st">"#99DDFF"</span>, <span class="st">"#44BB99"</span>, <span class="st">"#BBCC33"</span>, <span class="st">"#AAAA00"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize eclipse duration</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>ec_dur <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(eclipse_total_2024, <span class="fu">aes</span>(<span class="at">x =</span> state, <span class="at">y =</span> total_eclipse_duration)) <span class="sc">+</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"#E69F00"</span>, <span class="at">color =</span> <span class="st">"#0072B2"</span>,      </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.7</span>,                             </span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">outlier.color =</span> <span class="st">"#D55E00"</span>,                </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">outlier.shape =</span> <span class="dv">16</span>                         </span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">median</span>(eclipse_total_2024<span class="sc">$</span>total_eclipse_duration), </span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"#CC79A7"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>)<span class="sc">+</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"State"</span>, <span class="at">y =</span> <span class="st">"Total Eclipse Duration (secs)"</span>, <span class="at">title =</span> <span class="st">"Distribution of Total Eclipse Duration by State"</span>) <span class="sc">+</span>                     </span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>), </span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>),    </span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>), </span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"none"</span>                  </span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>ec_dur</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Don't know how to automatically pick scale for object of type &lt;difftime&gt;.
+Defaulting to continuous.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From this plot we can see that Texas, Oklahoma, Missouri, and Arkansas have the highest total eclipse duration. This is to be expected given the geographic “line” these states follow and the prediction of the line of totality.</p>
+<p>Given that longitude and latitude aren’t commonly used as measurements in everyday life, I want to explore the distribution of states by longitude and latitude in comparison to eclipse events.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Determine the unique states in your dataset</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>unique_states <span class="ot">&lt;-</span> <span class="fu">unique</span>(eclipse_total_2024<span class="sc">$</span>state)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a custom color palette based on the number of unique states</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>state_colors <span class="ot">&lt;-</span> <span class="fu">rainbow</span>(<span class="fu">length</span>(unique_states))</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the geographical scatter plot with the updated color palette</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>geo_dis <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(eclipse_total_2024, <span class="fu">aes</span>(<span class="at">x =</span> lon, <span class="at">y =</span> lat, <span class="at">color =</span> state)) <span class="sc">+</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span>  <span class="co"># Adjust transparency and point size</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">setNames</span>(state_colors, unique_states)) <span class="sc">+</span>  <span class="co"># Custom color palette for states</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Geographical Distribution of Eclipse Events by State"</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Longitude"</span>, <span class="at">y =</span> <span class="st">"Latitude"</span>, <span class="at">color =</span> <span class="st">"State"</span>) <span class="sc">+</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span>  <span class="co"># Minimalist theme</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_blank</span>(),  <span class="co"># Remove legend title</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>),  <span class="co"># White background</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"right"</span>  <span class="co"># Position legend on the right side</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>geo_dis</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This plot was created merely so I could understand where each state roughly lies on the longitude and latitude scale and to see how eclipse events travel across geographic coordinates.</p>
+<p>I am now going to move on and create a summary table of the average duration of totality by state.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a summary table with mean totality duration by state</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>summary_table <span class="ot">&lt;-</span> eclipse_total_2024 <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state) <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_duration =</span> <span class="fu">mean</span>(totality_duration))</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the gt table</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>sum_table <span class="ot">&lt;-</span> summary_table <span class="sc">%&gt;%</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Summary Statistics of Totality Duration by State"</span>,</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Data from Eclipse Events"</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">c</span>(<span class="st">"mean_duration"</span>),</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">2</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_borders</span>(<span class="at">sides =</span> <span class="st">"all"</span>, <span class="at">color =</span> <span class="st">"black"</span>)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>()</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_text</span>(<span class="at">size =</span> <span class="fu">px</span>(<span class="dv">10</span>)),</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_borders</span>(<span class="at">sides =</span> <span class="st">"all"</span>, <span class="at">color =</span> <span class="st">"gray"</span>)</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>()</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>sum_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="xzytxzpniz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#xzytxzpniz table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#xzytxzpniz thead, #xzytxzpniz tbody, #xzytxzpniz tfoot, #xzytxzpniz tr, #xzytxzpniz td, #xzytxzpniz th {
+  border-style: none;
+}
+
+#xzytxzpniz p {
+  margin: 0;
+  padding: 0;
+}
+
+#xzytxzpniz .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#xzytxzpniz .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#xzytxzpniz .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#xzytxzpniz .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#xzytxzpniz .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#xzytxzpniz .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xzytxzpniz .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#xzytxzpniz .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#xzytxzpniz .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#xzytxzpniz .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#xzytxzpniz .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#xzytxzpniz .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#xzytxzpniz .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#xzytxzpniz .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#xzytxzpniz .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#xzytxzpniz .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#xzytxzpniz .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#xzytxzpniz .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#xzytxzpniz .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xzytxzpniz .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#xzytxzpniz .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#xzytxzpniz .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#xzytxzpniz .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xzytxzpniz .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#xzytxzpniz .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#xzytxzpniz .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xzytxzpniz .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xzytxzpniz .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#xzytxzpniz .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xzytxzpniz .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#xzytxzpniz .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xzytxzpniz .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#xzytxzpniz .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xzytxzpniz .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#xzytxzpniz .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xzytxzpniz .gt_left {
+  text-align: left;
+}
+
+#xzytxzpniz .gt_center {
+  text-align: center;
+}
+
+#xzytxzpniz .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#xzytxzpniz .gt_font_normal {
+  font-weight: normal;
+}
+
+#xzytxzpniz .gt_font_bold {
+  font-weight: bold;
+}
+
+#xzytxzpniz .gt_font_italic {
+  font-style: italic;
+}
+
+#xzytxzpniz .gt_super {
+  font-size: 65%;
+}
+
+#xzytxzpniz .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#xzytxzpniz .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#xzytxzpniz .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#xzytxzpniz .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#xzytxzpniz .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#xzytxzpniz .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#xzytxzpniz .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+
+<table class="gt_table table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="header gt_heading">
+<th colspan="2" class="gt_heading gt_title gt_font_normal">Summary Statistics of Totality Duration by State</th>
+</tr>
+<tr class="odd gt_heading">
+<th colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Data from Eclipse Events</th>
+</tr>
+<tr class="header gt_col_headings">
+<th id="state" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: black; border-right-width: 1px; border-right-style: solid; border-right-color: black; border-top-width: 1px; border-top-style: solid; border-top-color: black; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: black" scope="col">state</th>
+<th id="mean_duration" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" style="font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: black; border-right-width: 1px; border-right-style: solid; border-right-color: black; border-top-width: 1px; border-top-style: solid; border-top-color: black; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: black" scope="col">mean_duration</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">AR</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">195.638356164384</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">IL</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">196.301587301587</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">IN</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">189.551194539249</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">KY</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">105.447368421053</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">ME</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">141.857142857143</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">MI</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">39.3333333333333</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">MO</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">184.535714285714</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">NH</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">134.5</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">NY</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">182.168734491315</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">OH</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">180.5670995671</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">OK</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">149.268292682927</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">PA</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">152.281690140845</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">TX</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">194.746192893401</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">VT</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">161.298850574713</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Illinois and Texas appear to have the highest totality duration out of all states. I am now going to switch gears and create a plot to show the totality duration across different states.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>tot_state <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(eclipse_total_2024, <span class="fu">aes</span>(<span class="at">x =</span> state, <span class="at">y =</span> totality_duration)) <span class="sc">+</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"summary"</span>, <span class="at">fun =</span> <span class="st">"mean"</span>, <span class="at">fill =</span> <span class="st">"#E69F00"</span>, <span class="at">color =</span> <span class="st">"#0072B2"</span>) <span class="sc">+</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="at">stat =</span> <span class="st">"summary"</span>, <span class="at">fun.min =</span> <span class="cf">function</span>(x) <span class="fu">mean</span>(x) <span class="sc">-</span> <span class="fu">sd</span>(x), </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">fun.max =</span> <span class="cf">function</span>(x) <span class="fu">mean</span>(x) <span class="sc">+</span> <span class="fu">sd</span>(x), <span class="at">width =</span> <span class="fl">0.2</span>) <span class="sc">+</span>  </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">stat =</span> <span class="st">"summary"</span>, <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, ..y..)), </span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span>  <span class="co"># Add data labels</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Average Totality Duration by State"</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"State"</span>, <span class="at">y =</span> <span class="st">"Average Totality Duration"</span>) <span class="sc">+</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> my_colors) <span class="sc">+</span>      </span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span>                        </span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),  </span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>),   </span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>), </span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>tot_state</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Don't know how to automatically pick scale for object of type &lt;difftime&gt;.
+Defaulting to continuous.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The dot-dot notation (`..y..`) was deprecated in ggplot2 3.4.0.
+ℹ Please use `after_stat(y)` instead.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>No summary function supplied, defaulting to `mean_se()`</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Here we can see exactly what we saw in the table, a distribution with exact values and error bars of the average duration of totality by state. I knew there would be some variability among these values, but Michigan had a much lower value that I was expecting.</p>
+<p>I also want to create a density plot showing the totality duration in seconds to explore the distribution of total duration values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>dens <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(eclipse_total_2024, <span class="fu">aes</span>(<span class="at">x =</span> totality_duration)) <span class="sc">+</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">10</span>, <span class="at">fill =</span> <span class="st">"#E69F00"</span>, <span class="at">color =</span> <span class="st">"#0072B2"</span>) <span class="sc">+</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">fill =</span> <span class="st">"skyblue"</span>) <span class="sc">+</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribution of Totality Duration"</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Totality Duration (seconds)"</span>, <span class="at">y =</span> <span class="st">"Density"</span>) <span class="sc">+</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> my_colors) <span class="sc">+</span>      <span class="co"># Custom color palette</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span>                           <span class="co"># Minimalist theme</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>),    <span class="co"># White background</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>), <span class="co"># Title appearance</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>dens</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Don't know how to automatically pick scale for object of type &lt;difftime&gt;.
+Defaulting to continuous.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From this plot we can see that totality lasted mostly between 180 and 220 seconds. This is a good frame of reference to have moving into machine learning model analysis.</p>
+<p>I am now going to move on to the second dataset, eclipse_annular_2023.</p>
+</section>
+</section>
+<section id="exploratory-data-analysis-of-eclipse_annular_2023-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis-of-eclipse_annular_2023-dataset">Exploratory Data Analysis of Eclipse_Annular_2023 dataset</h2>
+<p>The data dictionary for the eclipse_annular_2023 dataset is as follows:</p>
+<p>state: character 2-letter state abbreviation name: character city name lat: double latitude lon: double longitude eclipse_1: hms time at which the moon first contacts the sun in this location eclipse_2: hms time at which the eclipse is at 50% in this location eclipse_3: hms time at which annularity begins in this location eclipse_4: hms time at which annularity ends in this location eclipse_5: hms time at which the eclipse is back to 50% in this location eclipse_6: hms time at which the moon last contacts the sun in this location</p>
+<p>Similar to the process above, I want to create another plot of the distribution of eclipse events by longitude and latitude since this data set contains a few different states than the previous dataset.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot geographical distribution</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>geo_dis_annular <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(eclipse_annular_2023, <span class="fu">aes</span>(<span class="at">x =</span> lon, <span class="at">y =</span> lat, <span class="at">color =</span> state)) <span class="sc">+</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Geographical Distribution of Annular Eclipse Events by State"</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Longitude"</span>, <span class="at">y =</span> <span class="st">"Latitude"</span>, <span class="at">color =</span> <span class="st">"State"</span>) <span class="sc">+</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the plot</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(geo_dis_annular)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>I am now going to create a plot showing the total eclipse duration by state. The following three figures explore the annular duration by state in different formats. This is to strengthen my visualization skills and allow for a deeper understanding of the data distribution.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert hms columns to time format</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>eclipse_annular_2023 <span class="ot">&lt;-</span> eclipse_annular_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">eclipse_1_time =</span> <span class="fu">as.POSIXct</span>(eclipse_1, <span class="at">format =</span> <span class="st">"%H:%M:%S"</span>),</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">eclipse_2_time =</span> <span class="fu">as.POSIXct</span>(eclipse_2, <span class="at">format =</span> <span class="st">"%H:%M:%S"</span>),</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">eclipse_3_time =</span> <span class="fu">as.POSIXct</span>(eclipse_3, <span class="at">format =</span> <span class="st">"%H:%M:%S"</span>),</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">eclipse_4_time =</span> <span class="fu">as.POSIXct</span>(eclipse_4, <span class="at">format =</span> <span class="st">"%H:%M:%S"</span>),</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">eclipse_5_time =</span> <span class="fu">as.POSIXct</span>(eclipse_5, <span class="at">format =</span> <span class="st">"%H:%M:%S"</span>),</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">eclipse_6_time =</span> <span class="fu">as.POSIXct</span>(eclipse_6, <span class="at">format =</span> <span class="st">"%H:%M:%S"</span>)</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate duration of annularity</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>eclipse_annular_2023 <span class="ot">&lt;-</span> eclipse_annular_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">duration_annularity =</span> <span class="fu">difftime</span>(eclipse_4_time, eclipse_3_time, <span class="at">units =</span> <span class="st">"secs"</span>)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate total eclipse duration</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>eclipse_annular_2023 <span class="ot">&lt;-</span> eclipse_annular_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_eclipse_duration =</span> <span class="fu">difftime</span>(eclipse_6_time, eclipse_1_time, <span class="at">units =</span> <span class="st">"secs"</span>)</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary statistics for new variables</span></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(eclipse_annular_2023<span class="sc">$</span>totality_duration)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Length  Class   Mode 
+     0   NULL   NULL </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(eclipse_annular_2023<span class="sc">$</span>total_eclipse_duration)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Length    Class     Mode 
+     811 difftime  numeric </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize eclipse duration</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>ann_dur <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(eclipse_annular_2023, <span class="fu">aes</span>(<span class="at">x =</span> state, <span class="at">y =</span> total_eclipse_duration)) <span class="sc">+</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"#E69F00"</span>, <span class="at">color =</span> <span class="st">"#0072B2"</span>,      </span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.7</span>,                             </span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">outlier.color =</span> <span class="st">"#D55E00"</span>,                </span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">outlier.shape =</span> <span class="dv">16</span>                         </span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">median</span>(eclipse_annular_2023<span class="sc">$</span>total_eclipse_duration), </span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"#CC79A7"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>)<span class="sc">+</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"State"</span>, <span class="at">y =</span> <span class="st">"Total Eclipse Duration (secs)"</span>, <span class="at">title =</span> <span class="st">"Distribution of Total Eclipse Duration by State"</span>) <span class="sc">+</span>                     </span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>), </span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>),    </span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>), </span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"none"</span>                  </span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>ann_dur</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Don't know how to automatically pick scale for object of type &lt;difftime&gt;.
+Defaulting to continuous.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Similar to what we saw above, Texas had one of the highest durations of eclipse events, which is to be expected given the size of the state. Now, I am going to create a summary table of the average annularity duration by state.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a summary table with mean annularity duration by state</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>annular_sum_table <span class="ot">&lt;-</span> eclipse_annular_2023 <span class="sc">%&gt;%</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state) <span class="sc">%&gt;%</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_duration =</span> <span class="fu">mean</span>(eclipse_annular_2023<span class="sc">$</span>duration_annularity))</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the gt table</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>ann_sum <span class="ot">&lt;-</span> annular_sum_table <span class="sc">%&gt;%</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Summary Statistics of Annularity Duration by State"</span>,</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Data from Eclipse Events"</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">c</span>(<span class="st">"mean_duration"</span>),</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">2</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_borders</span>(<span class="at">sides =</span> <span class="st">"all"</span>, <span class="at">color =</span> <span class="st">"black"</span>)</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>()</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(</span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_text</span>(<span class="at">size =</span> <span class="fu">px</span>(<span class="dv">10</span>)),</span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_borders</span>(<span class="at">sides =</span> <span class="st">"all"</span>, <span class="at">color =</span> <span class="st">"gray"</span>)</span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>()</span>
+<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a>ann_sum</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="ddigydtxfc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ddigydtxfc table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#ddigydtxfc thead, #ddigydtxfc tbody, #ddigydtxfc tfoot, #ddigydtxfc tr, #ddigydtxfc td, #ddigydtxfc th {
+  border-style: none;
+}
+
+#ddigydtxfc p {
+  margin: 0;
+  padding: 0;
+}
+
+#ddigydtxfc .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ddigydtxfc .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#ddigydtxfc .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ddigydtxfc .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ddigydtxfc .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ddigydtxfc .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ddigydtxfc .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ddigydtxfc .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ddigydtxfc .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ddigydtxfc .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ddigydtxfc .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ddigydtxfc .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ddigydtxfc .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#ddigydtxfc .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#ddigydtxfc .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ddigydtxfc .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ddigydtxfc .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ddigydtxfc .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ddigydtxfc .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ddigydtxfc .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#ddigydtxfc .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#ddigydtxfc .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#ddigydtxfc .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ddigydtxfc .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#ddigydtxfc .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#ddigydtxfc .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ddigydtxfc .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ddigydtxfc .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ddigydtxfc .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ddigydtxfc .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ddigydtxfc .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ddigydtxfc .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ddigydtxfc .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ddigydtxfc .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ddigydtxfc .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ddigydtxfc .gt_left {
+  text-align: left;
+}
+
+#ddigydtxfc .gt_center {
+  text-align: center;
+}
+
+#ddigydtxfc .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ddigydtxfc .gt_font_normal {
+  font-weight: normal;
+}
+
+#ddigydtxfc .gt_font_bold {
+  font-weight: bold;
+}
+
+#ddigydtxfc .gt_font_italic {
+  font-style: italic;
+}
+
+#ddigydtxfc .gt_super {
+  font-size: 65%;
+}
+
+#ddigydtxfc .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#ddigydtxfc .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#ddigydtxfc .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#ddigydtxfc .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#ddigydtxfc .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#ddigydtxfc .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#ddigydtxfc .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+
+<table class="gt_table table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="header gt_heading">
+<th colspan="2" class="gt_heading gt_title gt_font_normal">Summary Statistics of Annularity Duration by State</th>
+</tr>
+<tr class="odd gt_heading">
+<th colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Data from Eclipse Events</th>
+</tr>
+<tr class="header gt_col_headings">
+<th id="state" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: black; border-right-width: 1px; border-right-style: solid; border-right-color: black; border-top-width: 1px; border-top-style: solid; border-top-color: black; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: black" scope="col">state</th>
+<th id="mean_duration" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" style="font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: black; border-right-width: 1px; border-right-style: solid; border-right-color: black; border-top-width: 1px; border-top-style: solid; border-top-color: black; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: black" scope="col">mean_duration</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">AZ</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">206.028360049322</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">CA</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">206.028360049322</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">CO</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">206.028360049322</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">NM</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">206.028360049322</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">NV</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">206.028360049322</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">OR</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">206.028360049322</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">TX</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">206.028360049322</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="state" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">UT</td>
+<td class="gt_row gt_center" headers="mean_duration" style="font-size: 10px; border-left-width: 1px; border-left-style: solid; border-left-color: gray; border-right-width: 1px; border-right-style: solid; border-right-color: gray; border-top-width: 1px; border-top-style: solid; border-top-color: gray; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: gray">206.028360049322</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Comparing State and Annularity Duration via Histogram</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>ann_state <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(eclipse_annular_2023, <span class="fu">aes</span>(<span class="at">x =</span> state, <span class="at">y =</span> duration_annularity)) <span class="sc">+</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"summary"</span>, <span class="at">fun =</span> <span class="st">"mean"</span>, <span class="at">fill =</span> <span class="st">"#E69F00"</span>, <span class="at">color =</span> <span class="st">"#0072B2"</span>) <span class="sc">+</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="at">stat =</span> <span class="st">"summary"</span>, <span class="at">fun.min =</span> <span class="cf">function</span>(x) <span class="fu">mean</span>(x) <span class="sc">-</span> <span class="fu">sd</span>(x), </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">fun.max =</span> <span class="cf">function</span>(x) <span class="fu">mean</span>(x) <span class="sc">+</span> <span class="fu">sd</span>(x), <span class="at">width =</span> <span class="fl">0.2</span>) <span class="sc">+</span>  </span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">stat =</span> <span class="st">"summary"</span>, <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, ..y..)), </span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span>  <span class="co"># Add data labels</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Average Annularity Duration by State"</span>,</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"State"</span>, <span class="at">y =</span> <span class="st">"Average Annularity Duration"</span>) <span class="sc">+</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> my_colors) <span class="sc">+</span>      </span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span>                        </span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),  </span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>),   </span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>), </span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>ann_state</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Don't know how to automatically pick scale for object of type &lt;difftime&gt;.
+Defaulting to continuous.
+No summary function supplied, defaulting to `mean_se()`</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Similar to the process above, I am going to create a density plot.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>ann_dens <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(eclipse_annular_2023, <span class="fu">aes</span>(<span class="at">x =</span> duration_annularity)) <span class="sc">+</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">10</span>, <span class="at">fill =</span> <span class="st">"#E69F00"</span>, <span class="at">color =</span> <span class="st">"#0072B2"</span>) <span class="sc">+</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">fill =</span> <span class="st">"skyblue"</span>) <span class="sc">+</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribution of Annularity Duration"</span>,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Totality Annularity (seconds)"</span>, <span class="at">y =</span> <span class="st">"Density"</span>) <span class="sc">+</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> my_colors) <span class="sc">+</span>      <span class="co"># Custom color palette</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span>                           <span class="co"># Minimalist theme</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>),    <span class="co"># White background</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>), <span class="co"># Title appearance</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>ann_dens</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Don't know how to automatically pick scale for object of type &lt;difftime&gt;.
+Defaulting to continuous.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As to be expected, the total annularity in seconds follows a similar distribution to the totality duration shown in the prior dataset.</p>
+</section>
+<section id="questions-and-hypotheses" class="level2">
+<h2 class="anchored" data-anchor-id="questions-and-hypotheses">Questions and Hypotheses</h2>
+<p>I plan to answer one question for the eclipse_total_2024 dataset, using a total of three models.</p>
+</section>
+<section id="models-for-eclipse_total_2024" class="level2">
+<h2 class="anchored" data-anchor-id="models-for-eclipse_total_2024">Models for eclipse_total_2024</h2>
+<p>Question 1: Is there a correlation between the state’s geographical location (latitude and longitude) and the duration of totality?</p>
+<section id="feature-engineering" class="level3">
+<h3 class="anchored" data-anchor-id="feature-engineering">Feature Engineering</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate distances between coordinates </span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>eclipse_total_2024<span class="sc">$</span>distance_km <span class="ot">&lt;-</span> <span class="fu">distHaversine</span>(<span class="fu">cbind</span>(eclipse_total_2024<span class="sc">$</span>lon, eclipse_total_2024<span class="sc">$</span>lat), <span class="fu">cbind</span>(<span class="fu">mean</span>(eclipse_total_2024<span class="sc">$</span>lon), <span class="fu">mean</span>(eclipse_total_2024<span class="sc">$</span>lat)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="splitting-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="splitting-the-data">Splitting the data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>split_total <span class="ot">&lt;-</span>  <span class="fu">initial_split</span>(eclipse_total_2024, <span class="at">prop =</span> <span class="fl">0.75</span>)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>total_train <span class="ot">&lt;-</span> <span class="fu">training</span>(split_total)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>total_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(split_total)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="model-selection" class="level3">
+<h3 class="anchored" data-anchor-id="model-selection">Model Selection</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Preprocessing Recipe</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>preprocess_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(total_eclipse_duration <span class="sc">~</span> lat <span class="sc">+</span> lon, <span class="at">data =</span> total_train) <span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_scale</span>(<span class="fu">all_numeric</span>(), <span class="sc">-</span><span class="fu">all_outcomes</span>())</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Model 1: Linear Regression</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>linear_model <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"regression"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>)</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Model 2: Random Forest Regression</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>rf_model <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"regression"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"ranger"</span>)</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Model 3: LASSO regression model</span></span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>lasso_model <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="fl">0.1</span>, <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"glmnet"</span>)</span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a><span class="co"># LASSO workflow</span></span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>lasso_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(preprocess_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="cross-validation-for-linear-regression-model" class="level3">
+<h3 class="anchored" data-anchor-id="cross-validation-for-linear-regression-model">Cross-Validation for Linear Regression Model</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Preprocessing Recipe</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>preprocess_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(total_eclipse_duration <span class="sc">~</span> lat <span class="sc">+</span> lon, <span class="at">data =</span> total_train) <span class="sc">%&gt;%</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_scale</span>(<span class="fu">all_numeric</span>(), <span class="sc">-</span><span class="fu">all_outcomes</span>())</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a workflow including preprocessing and modeling</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>linear_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(preprocess_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(linear_model)</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>total_train<span class="sc">$</span>total_eclipse_duration <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(total_train<span class="sc">$</span>total_eclipse_duration, <span class="at">units =</span> <span class="st">"secs"</span>)</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up CV with 5 folds</span></span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>linear_cv_total <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(total_train, <span class="at">v =</span> <span class="dv">5</span>)</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Train and evaluate the model using CV</span></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>linear_cv_results_total <span class="ot">&lt;-</span> linear_workflow <span class="sc">%&gt;%</span></span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(total_eclipse_duration <span class="sc">~</span> ., <span class="at">resamples =</span> linear_cv_total)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: ''</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get performance metrics from CV results</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>linear_cv_metrics <span class="ot">&lt;-</span> linear_cv_results_total <span class="sc">%&gt;%</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>()</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Print CV metrics</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(linear_cv_metrics)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  .metric .estimator   mean     n  std_err .config             
+  &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               
+1 rmse    standard   38.2       5 0.627    Preprocessor1_Model1
+2 rsq     standard    0.983     5 0.000528 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<p>The RMSE value for this linear regression model is low (38.18) suggesting that the model is predicting values, on average, 39.06 seconds different from the actual values. Additionally, an R^2 value of 0.983 (98.3%) suggests that, on average, the linear regression model explains approximately 98.3% of the variability in total_eclipse_duration, which is quite high and indicates a good fit of the model to the data.</p>
+</section>
+<section id="cross-validation-for-random-forest-model" class="level3">
+<h3 class="anchored" data-anchor-id="cross-validation-for-random-forest-model">Cross-Validation for Random Forest Model</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the model specification for Random Forest</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>rf_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">mode =</span> <span class="st">"regression"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"ranger"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the workflow including preprocessing steps if needed</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>rf_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(rf_spec) <span class="sc">%&gt;%</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_formula</span>(total_eclipse_duration <span class="sc">~</span> .)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform Cross-Validation</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>rf_cv_total <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(total_train, <span class="at">v =</span> <span class="dv">5</span>)  <span class="co"># Define your v-fold CV object</span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Train and evaluate the Random Forest model using CV</span></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>rf_cv_results_total <span class="ot">&lt;-</span> rf_workflow <span class="sc">%&gt;%</span></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(total_eclipse_duration <span class="sc">~</span> ., <span class="at">resamples =</span> rf_cv_total)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: ''</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the CV results</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>rf_cv_results_total</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Resampling results
+# 5-fold cross-validation 
+# A tibble: 5 × 4
+  splits             id    .metrics         .notes          
+  &lt;list&gt;             &lt;chr&gt; &lt;list&gt;           &lt;list&gt;          
+1 &lt;split [1997/500]&gt; Fold1 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;
+2 &lt;split [1997/500]&gt; Fold2 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;
+3 &lt;split [1998/499]&gt; Fold3 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;
+4 &lt;split [1998/499]&gt; Fold4 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;
+5 &lt;split [1998/499]&gt; Fold5 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the metrics for each fold</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>metrics_df <span class="ot">&lt;-</span> rf_cv_results_total <span class="sc">%&gt;%</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, .metrics) <span class="sc">%&gt;%</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="at">cols =</span> .metrics)</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the metrics dataframe</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(metrics_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 5
+   id    .metric .estimator .estimate .config             
+   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
+ 1 Fold1 rmse    standard      52.2   Preprocessor1_Model1
+ 2 Fold1 rsq     standard       0.975 Preprocessor1_Model1
+ 3 Fold2 rmse    standard      36.9   Preprocessor1_Model1
+ 4 Fold2 rsq     standard       0.990 Preprocessor1_Model1
+ 5 Fold3 rmse    standard      41.3   Preprocessor1_Model1
+ 6 Fold3 rsq     standard       0.986 Preprocessor1_Model1
+ 7 Fold4 rmse    standard      40.4   Preprocessor1_Model1
+ 8 Fold4 rsq     standard       0.985 Preprocessor1_Model1
+ 9 Fold5 rmse    standard      46.9   Preprocessor1_Model1
+10 Fold5 rsq     standard       0.981 Preprocessor1_Model1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate average RMSE and R-squared</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>average_rmse <span class="ot">&lt;-</span> <span class="fu">mean</span>(metrics_df<span class="sc">$</span>.estimate[metrics_df<span class="sc">$</span>.metric <span class="sc">==</span> <span class="st">"rmse"</span>])</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>average_rsquared <span class="ot">&lt;-</span> <span class="fu">mean</span>(metrics_df<span class="sc">$</span>.estimate[metrics_df<span class="sc">$</span>.metric <span class="sc">==</span> <span class="st">"rsq"</span>])</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the average RMSE and R-squared</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(average_rmse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 43.54282</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(average_rsquared)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.9835204</code></pre>
+</div>
+</div>
+<p>The RMSE value of 43.56 seconds suggests the difference between the predicted totallity duration and the actual duration of totality. This value is quite low, suggesting that the model is predicting well. The R-squared value of 0.983 suggests that, on average, approximately 94.5% of the variability in totality duration can be explained by the geographical coordinates (latitude and longitude) of the states. This implies a strong correlation between the state’s location and the duration of totality during an eclipse event.</p>
+</section>
+<section id="cross-validation-with-lasso-regression" class="level3">
+<h3 class="anchored" data-anchor-id="cross-validation-with-lasso-regression">Cross Validation with LASSO Regression</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># LASSO workflow</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>lasso_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(preprocess_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_model)</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up CV with 5 folds</span></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>lasso_cv <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(total_train, <span class="at">v =</span> <span class="dv">5</span>)</span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Train and evaluate the model using CV</span></span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>lasso_cv_results_total <span class="ot">&lt;-</span> lasso_wf <span class="sc">%&gt;%</span></span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(total_eclipse_duration <span class="sc">~</span> ., <span class="at">resamples =</span> lasso_cv)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: ''</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get performance metrics from CV results</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>lasso_cv_metrics <span class="ot">&lt;-</span> lasso_cv_results_total <span class="sc">%&gt;%</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>()</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Print CV metrics</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(lasso_cv_metrics)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  .metric .estimator   mean     n  std_err .config             
+  &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               
+1 rmse    standard   38.3       5 0.604    Preprocessor1_Model1
+2 rsq     standard    0.983     5 0.000565 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<p>The RMSE value of 38.27 seconds suggests the difference between the predicted totality duration and the actual duration of totality. This value is again very low, suggesting that the model is predicting well. The R-squared value of 0.983 suggests that, on average, approximately 98.3% of the variability in totality duration can be explained by the geographical coordinates of the states. These result imply a significant correlation between the state’s location and the duration of totality during an eclipse event.</p>
+<p>From the three previous model assessments, I believe that the LASSO regression model performed better than the Random Forest Model and Linear Regression Model given the RMSE and R-squared values. I am now going to perform the same CV technique using the testing data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Test Recipe</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>test_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(total_eclipse_duration <span class="sc">~</span> lat <span class="sc">+</span> lon, <span class="at">data =</span> total_test) <span class="sc">%&gt;%</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_scale</span>(<span class="fu">all_numeric</span>(), <span class="sc">-</span><span class="fu">all_outcomes</span>())</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a><span class="co"># LASSO workflow</span></span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>lasso_wf2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(test_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_model)</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up CV with 5 folds</span></span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>lasso_cv2 <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(total_test, <span class="at">v =</span> <span class="dv">5</span>)</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Train and evaluate the model using CV</span></span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>lasso_cv_results_total2 <span class="ot">&lt;-</span> lasso_wf2 <span class="sc">%&gt;%</span></span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(total_eclipse_duration <span class="sc">~</span> ., <span class="at">resamples =</span> lasso_cv)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `...` are not used in this function but one or more objects were
+passed: ''</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get performance metrics from CV results</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>lasso_cv_metrics2 <span class="ot">&lt;-</span> lasso_cv_results_total2 <span class="sc">%&gt;%</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>()</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Print CV metrics</span></span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(lasso_cv_metrics2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  .metric .estimator   mean     n  std_err .config             
+  &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;               
+1 rmse    standard   38.3       5 0.604    Preprocessor1_Model1
+2 rsq     standard    0.983     5 0.000565 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<p>After performing the same LASSO regression with CV on the test data, the results were remarkably similar; indicating that the model is performing well on the both training data and testing data. These data were highly correlated to begin with, so this is to be expected. I have never worked with data like these before so this whole process was challenging, yet very rewarding.</p>
+<p>I am now going to create a plot some tables comparing the model results.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a data frame with the model metrics</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>model_metrics <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">"Linear Regression"</span>, <span class="st">"Random Forest"</span>, <span class="st">"LASSO Regression"</span>),</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">RMSE =</span> <span class="fu">c</span>(<span class="fl">38.18</span>, <span class="fl">43.56</span>, <span class="fl">38.27</span>),</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">R_squared =</span> <span class="fu">c</span>(<span class="fl">98.3</span>, <span class="fl">98.3</span>, <span class="fl">98.4</span>)</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Melt the data frame for plotting</span></span>
+<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>model_metrics_long <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(model_metrics, <span class="at">cols =</span> <span class="fu">c</span>(RMSE, R_squared), <span class="at">names_to =</span> <span class="st">"Metric"</span>, <span class="at">values_to =</span> <span class="st">"Value"</span>)</span>
+<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Define custom colors</span></span>
+<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a>my_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#1F78B4"</span>, <span class="st">"#33A02C"</span>)  <span class="co"># blue and green</span></span>
+<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-15"><a href="#cb60-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting</span></span>
+<span id="cb60-16"><a href="#cb60-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(model_metrics_long, <span class="fu">aes</span>(<span class="at">x =</span> Model, <span class="at">y =</span> Value, <span class="at">fill =</span> Metric)) <span class="sc">+</span></span>
+<span id="cb60-17"><a href="#cb60-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">width =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb60-18"><a href="#cb60-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> my_colors) <span class="sc">+</span>  <span class="co"># Apply custom colors</span></span>
+<span id="cb60-19"><a href="#cb60-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Model Performance Comparison"</span>,</span>
+<span id="cb60-20"><a href="#cb60-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Value"</span>,</span>
+<span id="cb60-21"><a href="#cb60-21" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Metric"</span>) <span class="sc">+</span></span>
+<span id="cb60-22"><a href="#cb60-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb60-23"><a href="#cb60-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb60-24"><a href="#cb60-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">18</span>, <span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">b =</span> <span class="dv">10</span>)),</span>
+<span id="cb60-25"><a href="#cb60-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb60-26"><a href="#cb60-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>, <span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
+<span id="cb60-27"><a href="#cb60-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb60-28"><a href="#cb60-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb60-29"><a href="#cb60-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb60-30"><a href="#cb60-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb60-31"><a href="#cb60-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb60-32"><a href="#cb60-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.border =</span> <span class="fu">element_rect</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">fill =</span> <span class="cn">NA</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>),</span>
+<span id="cb60-33"><a href="#cb60-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"white"</span>)</span>
+<span id="cb60-34"><a href="#cb60-34" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tidytuesday-exercise_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From this plot we can conclude that based on RMSE and R-squared metrics, LASSO regression performed “the best” compared to Linear Regression and Random Forest. This conclusion was justified when performing LASSO regression again with the test data. The metrics calculated by performing 5-fold Cross Validation LASSO Regression on the test data were in line with the training metrics, and indicated that the model performed well.</p>
 
 
+</section>
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
