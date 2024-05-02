@@ -251,7 +251,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 ✖ dplyr::filter()  masks stats::filter()
 ✖ dplyr::lag()     masks stats::lag()
 ✖ recipes::step()  masks stats::step()
-• Dig deeper into tidy modeling with R at https://www.tmwr.org</code></pre>
+• Use suppressPackageStartupMessages() to eliminate package startup messages</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -464,23 +464,23 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the table</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(gt_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>&lt;div id="okkvixqoyy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;"&gt;
-  &lt;style&gt;#okkvixqoyy table {
+<pre><code>&lt;div id="xfrbrllfac" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;"&gt;
+  &lt;style&gt;#xfrbrllfac table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#okkvixqoyy thead, #okkvixqoyy tbody, #okkvixqoyy tfoot, #okkvixqoyy tr, #okkvixqoyy td, #okkvixqoyy th {
+#xfrbrllfac thead, #xfrbrllfac tbody, #xfrbrllfac tfoot, #xfrbrllfac tr, #xfrbrllfac td, #xfrbrllfac th {
   border-style: none;
 }
 
-#okkvixqoyy p {
+#xfrbrllfac p {
   margin: 0;
   padding: 0;
 }
 
-#okkvixqoyy .gt_table {
+#xfrbrllfac .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -506,12 +506,12 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-left-color: #D3D3D3;
 }
 
-#okkvixqoyy .gt_caption {
+#xfrbrllfac .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#okkvixqoyy .gt_title {
+#xfrbrllfac .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -523,7 +523,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-bottom-width: 0;
 }
 
-#okkvixqoyy .gt_subtitle {
+#xfrbrllfac .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -535,7 +535,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-top-width: 0;
 }
 
-#okkvixqoyy .gt_heading {
+#xfrbrllfac .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -547,13 +547,13 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-right-color: #D3D3D3;
 }
 
-#okkvixqoyy .gt_bottom_border {
+#xfrbrllfac .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#okkvixqoyy .gt_col_headings {
+#xfrbrllfac .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -568,7 +568,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-right-color: #D3D3D3;
 }
 
-#okkvixqoyy .gt_col_heading {
+#xfrbrllfac .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -588,7 +588,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   overflow-x: hidden;
 }
 
-#okkvixqoyy .gt_column_spanner_outer {
+#xfrbrllfac .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -600,15 +600,15 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   padding-right: 4px;
 }
 
-#okkvixqoyy .gt_column_spanner_outer:first-child {
+#xfrbrllfac .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#okkvixqoyy .gt_column_spanner_outer:last-child {
+#xfrbrllfac .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#okkvixqoyy .gt_column_spanner {
+#xfrbrllfac .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -620,11 +620,11 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   width: 100%;
 }
 
-#okkvixqoyy .gt_spanner_row {
+#xfrbrllfac .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#okkvixqoyy .gt_group_heading {
+#xfrbrllfac .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -650,7 +650,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   text-align: left;
 }
 
-#okkvixqoyy .gt_empty_group_heading {
+#xfrbrllfac .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -665,15 +665,15 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   vertical-align: middle;
 }
 
-#okkvixqoyy .gt_from_md &gt; :first-child {
+#xfrbrllfac .gt_from_md &gt; :first-child {
   margin-top: 0;
 }
 
-#okkvixqoyy .gt_from_md &gt; :last-child {
+#xfrbrllfac .gt_from_md &gt; :last-child {
   margin-bottom: 0;
 }
 
-#okkvixqoyy .gt_row {
+#xfrbrllfac .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -692,7 +692,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   overflow-x: hidden;
 }
 
-#okkvixqoyy .gt_stub {
+#xfrbrllfac .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -705,7 +705,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   padding-right: 5px;
 }
 
-#okkvixqoyy .gt_stub_row_group {
+#xfrbrllfac .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -719,15 +719,15 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   vertical-align: top;
 }
 
-#okkvixqoyy .gt_row_group_first td {
+#xfrbrllfac .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#okkvixqoyy .gt_row_group_first th {
+#xfrbrllfac .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#okkvixqoyy .gt_summary_row {
+#xfrbrllfac .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -737,16 +737,16 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   padding-right: 5px;
 }
 
-#okkvixqoyy .gt_first_summary_row {
+#xfrbrllfac .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#okkvixqoyy .gt_first_summary_row.thick {
+#xfrbrllfac .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#okkvixqoyy .gt_last_summary_row {
+#xfrbrllfac .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -756,7 +756,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-bottom-color: #D3D3D3;
 }
 
-#okkvixqoyy .gt_grand_summary_row {
+#xfrbrllfac .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -766,7 +766,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   padding-right: 5px;
 }
 
-#okkvixqoyy .gt_first_grand_summary_row {
+#xfrbrllfac .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -776,7 +776,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-top-color: #D3D3D3;
 }
 
-#okkvixqoyy .gt_last_grand_summary_row_top {
+#xfrbrllfac .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -786,11 +786,11 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-bottom-color: #D3D3D3;
 }
 
-#okkvixqoyy .gt_striped {
+#xfrbrllfac .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#okkvixqoyy .gt_table_body {
+#xfrbrllfac .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -799,7 +799,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-bottom-color: #D3D3D3;
 }
 
-#okkvixqoyy .gt_footnotes {
+#xfrbrllfac .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -813,7 +813,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-right-color: #D3D3D3;
 }
 
-#okkvixqoyy .gt_footnote {
+#xfrbrllfac .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -822,7 +822,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   padding-right: 5px;
 }
 
-#okkvixqoyy .gt_sourcenotes {
+#xfrbrllfac .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -836,7 +836,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-right-color: #D3D3D3;
 }
 
-#okkvixqoyy .gt_sourcenote {
+#xfrbrllfac .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -844,63 +844,63 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   padding-right: 5px;
 }
 
-#okkvixqoyy .gt_left {
+#xfrbrllfac .gt_left {
   text-align: left;
 }
 
-#okkvixqoyy .gt_center {
+#xfrbrllfac .gt_center {
   text-align: center;
 }
 
-#okkvixqoyy .gt_right {
+#xfrbrllfac .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#okkvixqoyy .gt_font_normal {
+#xfrbrllfac .gt_font_normal {
   font-weight: normal;
 }
 
-#okkvixqoyy .gt_font_bold {
+#xfrbrllfac .gt_font_bold {
   font-weight: bold;
 }
 
-#okkvixqoyy .gt_font_italic {
+#xfrbrllfac .gt_font_italic {
   font-style: italic;
 }
 
-#okkvixqoyy .gt_super {
+#xfrbrllfac .gt_super {
   font-size: 65%;
 }
 
-#okkvixqoyy .gt_footnote_marks {
+#xfrbrllfac .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#okkvixqoyy .gt_asterisk {
+#xfrbrllfac .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#okkvixqoyy .gt_indent_1 {
+#xfrbrllfac .gt_indent_1 {
   text-indent: 5px;
 }
 
-#okkvixqoyy .gt_indent_2 {
+#xfrbrllfac .gt_indent_2 {
   text-indent: 10px;
 }
 
-#okkvixqoyy .gt_indent_3 {
+#xfrbrllfac .gt_indent_3 {
   text-indent: 15px;
 }
 
-#okkvixqoyy .gt_indent_4 {
+#xfrbrllfac .gt_indent_4 {
   text-indent: 20px;
 }
 
-#okkvixqoyy .gt_indent_5 {
+#xfrbrllfac .gt_indent_5 {
   text-indent: 25px;
 }
 &lt;/style&gt;
@@ -1002,23 +1002,23 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
 <span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the table</span></span>
 <span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>gt_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="uqspnvnevl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#uqspnvnevl table {
+<div id="okloddporj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#okloddporj table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#uqspnvnevl thead, #uqspnvnevl tbody, #uqspnvnevl tfoot, #uqspnvnevl tr, #uqspnvnevl td, #uqspnvnevl th {
+#okloddporj thead, #okloddporj tbody, #okloddporj tfoot, #okloddporj tr, #okloddporj td, #okloddporj th {
   border-style: none;
 }
 
-#uqspnvnevl p {
+#okloddporj p {
   margin: 0;
   padding: 0;
 }
 
-#uqspnvnevl .gt_table {
+#okloddporj .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1044,12 +1044,12 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-left-color: #D3D3D3;
 }
 
-#uqspnvnevl .gt_caption {
+#okloddporj .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#uqspnvnevl .gt_title {
+#okloddporj .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1061,7 +1061,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-bottom-width: 0;
 }
 
-#uqspnvnevl .gt_subtitle {
+#okloddporj .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1073,7 +1073,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-top-width: 0;
 }
 
-#uqspnvnevl .gt_heading {
+#okloddporj .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1085,13 +1085,13 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-right-color: #D3D3D3;
 }
 
-#uqspnvnevl .gt_bottom_border {
+#okloddporj .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#uqspnvnevl .gt_col_headings {
+#okloddporj .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1106,7 +1106,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-right-color: #D3D3D3;
 }
 
-#uqspnvnevl .gt_col_heading {
+#okloddporj .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1126,7 +1126,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   overflow-x: hidden;
 }
 
-#uqspnvnevl .gt_column_spanner_outer {
+#okloddporj .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1138,15 +1138,15 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   padding-right: 4px;
 }
 
-#uqspnvnevl .gt_column_spanner_outer:first-child {
+#okloddporj .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#uqspnvnevl .gt_column_spanner_outer:last-child {
+#okloddporj .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#uqspnvnevl .gt_column_spanner {
+#okloddporj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1158,11 +1158,11 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   width: 100%;
 }
 
-#uqspnvnevl .gt_spanner_row {
+#okloddporj .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#uqspnvnevl .gt_group_heading {
+#okloddporj .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1188,7 +1188,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   text-align: left;
 }
 
-#uqspnvnevl .gt_empty_group_heading {
+#okloddporj .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1203,15 +1203,15 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   vertical-align: middle;
 }
 
-#uqspnvnevl .gt_from_md > :first-child {
+#okloddporj .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#uqspnvnevl .gt_from_md > :last-child {
+#okloddporj .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#uqspnvnevl .gt_row {
+#okloddporj .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1230,7 +1230,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   overflow-x: hidden;
 }
 
-#uqspnvnevl .gt_stub {
+#okloddporj .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1243,7 +1243,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   padding-right: 5px;
 }
 
-#uqspnvnevl .gt_stub_row_group {
+#okloddporj .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1257,15 +1257,15 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   vertical-align: top;
 }
 
-#uqspnvnevl .gt_row_group_first td {
+#okloddporj .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#uqspnvnevl .gt_row_group_first th {
+#okloddporj .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#uqspnvnevl .gt_summary_row {
+#okloddporj .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1275,16 +1275,16 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   padding-right: 5px;
 }
 
-#uqspnvnevl .gt_first_summary_row {
+#okloddporj .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#uqspnvnevl .gt_first_summary_row.thick {
+#okloddporj .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#uqspnvnevl .gt_last_summary_row {
+#okloddporj .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1294,7 +1294,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-bottom-color: #D3D3D3;
 }
 
-#uqspnvnevl .gt_grand_summary_row {
+#okloddporj .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1304,7 +1304,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   padding-right: 5px;
 }
 
-#uqspnvnevl .gt_first_grand_summary_row {
+#okloddporj .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1314,7 +1314,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-top-color: #D3D3D3;
 }
 
-#uqspnvnevl .gt_last_grand_summary_row_top {
+#okloddporj .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1324,11 +1324,11 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-bottom-color: #D3D3D3;
 }
 
-#uqspnvnevl .gt_striped {
+#okloddporj .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#uqspnvnevl .gt_table_body {
+#okloddporj .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1337,7 +1337,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-bottom-color: #D3D3D3;
 }
 
-#uqspnvnevl .gt_footnotes {
+#okloddporj .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1351,7 +1351,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-right-color: #D3D3D3;
 }
 
-#uqspnvnevl .gt_footnote {
+#okloddporj .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1360,7 +1360,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   padding-right: 5px;
 }
 
-#uqspnvnevl .gt_sourcenotes {
+#okloddporj .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1374,7 +1374,7 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   border-right-color: #D3D3D3;
 }
 
-#uqspnvnevl .gt_sourcenote {
+#okloddporj .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1382,63 +1382,63 @@ Since gt v0.3.0, `columns = vars(...)` has been deprecated.
   padding-right: 5px;
 }
 
-#uqspnvnevl .gt_left {
+#okloddporj .gt_left {
   text-align: left;
 }
 
-#uqspnvnevl .gt_center {
+#okloddporj .gt_center {
   text-align: center;
 }
 
-#uqspnvnevl .gt_right {
+#okloddporj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#uqspnvnevl .gt_font_normal {
+#okloddporj .gt_font_normal {
   font-weight: normal;
 }
 
-#uqspnvnevl .gt_font_bold {
+#okloddporj .gt_font_bold {
   font-weight: bold;
 }
 
-#uqspnvnevl .gt_font_italic {
+#okloddporj .gt_font_italic {
   font-style: italic;
 }
 
-#uqspnvnevl .gt_super {
+#okloddporj .gt_super {
   font-size: 65%;
 }
 
-#uqspnvnevl .gt_footnote_marks {
+#okloddporj .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#uqspnvnevl .gt_asterisk {
+#okloddporj .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#uqspnvnevl .gt_indent_1 {
+#okloddporj .gt_indent_1 {
   text-indent: 5px;
 }
 
-#uqspnvnevl .gt_indent_2 {
+#okloddporj .gt_indent_2 {
   text-indent: 10px;
 }
 
-#uqspnvnevl .gt_indent_3 {
+#okloddporj .gt_indent_3 {
   text-indent: 15px;
 }
 
-#uqspnvnevl .gt_indent_4 {
+#okloddporj .gt_indent_4 {
   text-indent: 20px;
 }
 
-#uqspnvnevl .gt_indent_5 {
+#okloddporj .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
