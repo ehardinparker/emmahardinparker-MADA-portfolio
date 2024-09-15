@@ -24,9 +24,9 @@ library(glmnet)
 ```
 
 ```{r}
-eclipse_total_2024 <- read.csv("~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/data/eclipse_total_2024.csv")
+eclipse_total_2024 <- read.csv("~/Desktop/Completed/CPH_Spring2024/BIOS8060E/emmahardinparker-MADA-portfolio/tidytuesday-exercise/eclipse_total_2024.csv")
 
-eclipse_annular_2023 <- read.csv("~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/data/eclipse_annular_2023.csv")
+eclipse_annular_2023 <- read.csv("~/Desktop/Completed/CPH_Spring2024/BIOS8060E/emmahardinparker-MADA-portfolio/tidytuesday-exercise/eclipse_annular_2023.csv")
 ```
 
 ## Background
