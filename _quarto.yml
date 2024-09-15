@@ -34,7 +34,7 @@ website:
 
 format:
   html:
-    theme: lux
+    theme: sandstone
     highlight: zenburn
     css: styles.css
     toc: FALSE
