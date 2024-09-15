@@ -29,7 +29,7 @@ Here is the figure I am going to recreate
 # Importing Dataset
 
 ```{r}
-p_values <- read.csv("~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/presentation-exercise/p_values_analysis.csv") 
+p_values <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/presentation-exercise/p_values_analysis.csv") 
 ```
 
 # P-Value table 
@@ -138,7 +138,7 @@ Here is the figure I am going to recreate
 # Importing Dataset 
 
 ```{r}
-eu_terrorism_fatalities_by_country <- read.csv("~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/presentation-exercise/eu_terrorism_fatalities_by_country.csv")
+eu_terrorism_fatalities_by_country <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/presentation-exercise/eu_terrorism_fatalities_by_country.csv")
 ```
 
 # Re-creating Graph 

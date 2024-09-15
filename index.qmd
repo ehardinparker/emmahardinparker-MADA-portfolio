@@ -2,7 +2,7 @@
 
 # WELCOME!
 
-I am a second-year MPH candidate at the University of Georgia concentrating in Biostatistics seeking professional opportunies in data analysis and development. This site will include information about me, as well as my work completed in various coursework and research projects. This website was originally created as a medium for showcasing my coursework in BIOS 8030: Modern Applied Data Analysis, taken at UGA in the Spring 2024 semester. 
+I am a second-year MPH candidate at the University of Georgia concentrating in Biostatistics seeking professional opportunies in data analysis and development. This site will include information about me, as well as my work completed in various coursework and research projects. This website was originally created as a medium for showcasing my coursework in BIOS 8060: Modern Applied Data Analysis, taken at UGA in the Spring 2024 semester. 
 
 -   Please use the `Menu Bar` above to take a look.
 -   Feel free to contact me by email at egh14911@uga.edu or ehardinparker@gmail.com 

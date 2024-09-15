@@ -641,15 +641,15 @@ Saving the clean data set into an RDS file to then use in the ml-models-exercise
 ```{r}
 
 getwd()
-setwd("/Users/emmahardinparker/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise")
+setwd("/Users/ehardinparker/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise")
 
-saveRDS(final_data, file = "/Users/emmahardinparker/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise/data_with_race.rds")
+saveRDS(final_data, file = "/Users/ehardinparker/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise/data_with_race.rds")
 
 # Specify the source file path (current location of the RDS file)
-source_file <- "/Users/emmahardinparker/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise/data_with_race.rds"
+source_file <- "/Users/ehardinparker/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/fitting-exercise/data_with_race.rds"
 
 # Specify the destination folder where you want to copy the RDS file
-destination_folder <- "/Users/emmahardinparker/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/ml-models-exercise/"
+destination_folder <- "/Users/ehardinparker/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/ml-models-exercise/"
 
 # Use file.copy() to copy the RDS file to the destination folder
 file.copy(from = source_file, to = destination_folder)

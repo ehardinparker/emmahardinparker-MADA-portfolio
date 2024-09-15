@@ -16,7 +16,7 @@ library(here)
 library(tidyverse)
 library(ggplot2)
 
-nchs_data <- read.csv("~/Desktop/NCHS_-_VSRR_Quarterly_provisional_estimates_for_selected_birth_indicators_20240206.csv")
+nchs_data <- read_csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/cdcdata-exercise/NCHS_-_VSRR_Quarterly_provisional_estimates_for_selected_birth_indicators_20240915.csv")
 View(nchs_data)
 ```
 
@@ -30,8 +30,7 @@ summary(nchs_data)
 glimpse(nchs_data)
 ```
 
-The data set has 1,110 observations and 8 variables. At first glance there doesn't seem to be any NA values, but I am going to check using the NA values. After print nchs_na, I found that there were no NA values, however, I took that command out as it printed "FALSE" for every observation in the data set. Also, I noticed in the Significant column, that significant values are coded with asteriks. I could imagine that would make future exploratory analyses difficult, so I plan to recode significant values to 1 and non-significant values to 0.
-
+The data set has 1,110 observations and 8 variables. At first glance there doesn't seem to be any NA values, but I am going to check using the NA values. After print nchs_na, I found that there were no NA values, however, I took that command out as it printed "FALSE" for every observation in the data set. 
 ```{r}
 nchs_na <- is.na(nchs_data)
 
@@ -54,13 +53,13 @@ I am now going to create an exploratory plot to see which race/ethnicity categor
 
 ```{r}
 filtered_race <- nchs_recode %>%
-  filter(Race.Ethnicity.Category != "All races and origins")  # Remove rows where 'Race' is "All"
+  filter(`Race Ethnicity Category` != "All races and origins")  # Remove rows where 'Race' is "All"
 
 
 birth_rate_bar <- filtered_race %>%
-  group_by(Year.and.Quarter) %>%
+  group_by(`Year and Quarter`) %>%
   filter(Topic == "Birth Rates") %>% 
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  ggplot(aes(x = interaction(Indicator, RaceEthnicityCategory), y = Rate, fill = `Race Ethnicity Category`)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Birth Rate Rate by Age Category and Race",
        x = "Age Category / Race",
@@ -69,10 +68,10 @@ birth_rate_bar <- filtered_race %>%
   theme(axis.text.x = element_text(angle = 60, hjust = 1))  
 
 hispanic_rate_bar <- nchs_recode %>%
-  filter(Race.Ethnicity.Category == "Hispanic") %>%
+  filter(`Race Ethnicity Category` == "Hispanic") %>%
   filter(Topic == "Birth Rates") %>%
-  group_by(Year.and.Quarter) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  group_by(`Year and Quarter`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate, fill = `Race Ethnicity Category`)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Birth Rate Rate by Age Category and Race",
        x = "Age Category / Race",
@@ -81,10 +80,10 @@ hispanic_rate_bar <- nchs_recode %>%
   theme(axis.text.x = element_text(angle = 60, hjust = 1)) 
 
 white_rate_bar <- nchs_recode %>%
-  filter(Race.Ethnicity.Category == "Non-Hispanic White") %>%
+  filter(`Race Ethnicity Category` == "Non-Hispanic White") %>%
   filter(Topic == "Birth Rates") %>%
-  group_by(Year.and.Quarter) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate)) +
+  group_by(`Year and Quarter`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Birth Rate Rate by Age Category and Race",
        x = "Age Category / Race",
@@ -94,10 +93,10 @@ white_rate_bar <- nchs_recode %>%
   scale_color_viridis_d()
 
 black_rate_bar <- nchs_recode %>%
-  filter(Race.Ethnicity.Category == "Non-Hispanic Black") %>%
+  filter(`Race Ethnicity Category` == "Non-Hispanic Black") %>%
   filter(Topic == "Birth Rates") %>%
-  group_by(Year.and.Quarter) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate)) +
+  group_by(`Year and Quarter`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Birth Rate Rate by Age Category and Race",
        x = "Age Category / Race",
@@ -116,9 +115,9 @@ I am now going to create plots exploring the rate of low birthweight (per 100 bi
 
 ```{r}
 low_birth <- filtered_race %>%
-  filter(Topic.Subgroup == "Low Birthweight Rates") %>%
-  group_by(Race.Ethnicity.Category) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  filter(`Topic Subgroup` == "Low Birthweight Rates") %>%
+  group_by(`Race Ethnicity Category`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate, fill = `Race Ethnicity Category`)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Low Birthweight Rates by Race",
        x = "Age Category / Race",
@@ -133,9 +132,9 @@ I am now going to create a similar plot concerning preterm birth rates per 100 b
 
 ```{r}
 pre_birth <- filtered_race %>%
-  filter(Topic.Subgroup == "Preterm Birth Rates") %>%
-  group_by(Race.Ethnicity.Category) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  filter(`Topic Subgroup` == "Preterm Birth Rates") %>%
+  group_by(`Race Ethnicity Category`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate, fill = `Race Ethnicity Category`)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Preterm Birth Rates by Race",
        x = "Race",
@@ -151,9 +150,9 @@ I am now going to create a similar plot concerning NICU admission rates per 100 
 
 ```{r}
 NICU <- filtered_race %>%
-  filter(Topic.Subgroup == "NICU Admission Rates") %>%
-  group_by(Race.Ethnicity.Category) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  filter(`Topic Subgroup` == "NICU Admission Rates") %>%
+  group_by(`Race Ethnicity Category`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate, fill = `Race Ethnicity Category`)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "NICU Admission Rates by Age Category and Race",
        x = "Race",
@@ -169,9 +168,9 @@ I am now going to create a similar plot exploring Teen Birth Rates by Age Catego
 
 ```{r}
 teen_birth <- filtered_race %>%
-  filter(Topic.Subgroup == "Teen Birth Rates") %>%
-  group_by(Race.Ethnicity.Category) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  filter(`Topic Subgroup` == "Teen Birth Rates") %>%
+  group_by(`Race Ethnicity Category`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate, fill = `Race Ethnicity Category`)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = " Teen Birth Rate Rate by Age Category and Race",
        x = "Age Category / Race",
@@ -215,9 +214,9 @@ We can see that the numbers have clearly been swapped around for the Rate column
 ```{r}
 
 birth_rate_bar2 <- filtered_copy %>%
-  group_by(Year.and.Quarter) %>%
+  group_by(`Year and Quarter`) %>%
   filter(Topic == "Birth Rates") %>% 
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate, fill = `Race Ethnicity Category`)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Birth Rate Rate by Age Category and Race",
        x = "Age Category / Race",
@@ -226,10 +225,10 @@ birth_rate_bar2 <- filtered_copy %>%
   theme(axis.text.x = element_text(angle = 60, hjust = 1))  
 
 hispanic_rate_bar2 <- filtered_copy %>%
-  filter(Race.Ethnicity.Category == "Hispanic") %>%
+  filter(`Race Ethnicity Category` == "Hispanic") %>%
   filter(Topic == "Birth Rates") %>%
-  group_by(Year.and.Quarter) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  group_by(`Year and Quarter`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate, fill = `Race Ethnicity Category`)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Birth Rate Rate by Age Category and Race",
        x = "Age Category / Race",
@@ -238,10 +237,10 @@ hispanic_rate_bar2 <- filtered_copy %>%
   theme(axis.text.x = element_text(angle = 60, hjust = 1)) 
 
 white_rate_bar2 <- filtered_copy %>%
-  filter(Race.Ethnicity.Category == "Non-Hispanic White") %>%
+  filter(`Race Ethnicity Category` == "Non-Hispanic White") %>%
   filter(Topic == "Birth Rates") %>%
-  group_by(Year.and.Quarter) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate)) +
+  group_by(`Year and Quarter`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Birth Rate Rate by Age Category and Race",
        x = "Age Category / Race",
@@ -251,10 +250,10 @@ white_rate_bar2 <- filtered_copy %>%
   scale_color_viridis_d()
 
 black_rate_bar2 <- filtered_copy %>%
-  filter(Race.Ethnicity.Category == "Non-Hispanic Black") %>%
+  filter(`Race Ethnicity Category` == "Non-Hispanic Black") %>%
   filter(Topic == "Birth Rates") %>%
-  group_by(Year.and.Quarter) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate)) +
+  group_by(`Year and Quarter`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Birth Rate Rate by Age Category and Race",
        x = "Age Category / Race",
@@ -275,9 +274,9 @@ We can see that these distributions are very different, yet the structure of the
 
 ```{r}
 low_birth2 <- filtered_copy %>%
-  filter(Topic.Subgroup == "Low Birthweight Rates") %>%
-  group_by(Race.Ethnicity.Category) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  filter(`Topic Subgroup` == "Low Birthweight Rates") %>%
+  group_by(`Race Ethnicity Category`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate, fill = `Race Ethnicity Category`)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Low Birthweight Rates by Race",
        x = "Age Category / Race",
@@ -292,9 +291,9 @@ This one wasn't changed as dramatically, but the distribution has gone from norm
 
 ```{r}
 pre_birth2 <- filtered_copy %>%
-  filter(Topic.Subgroup == "Preterm Birth Rates") %>%
-  group_by(Race.Ethnicity.Category) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  filter(`Topic Subgroup` == "Preterm Birth Rates") %>%
+  group_by(`Race Ethnicity Category`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate, fill = `Race Ethnicity Category`)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Preterm Birth Rates by Race",
        x = "Race",
@@ -310,9 +309,9 @@ Now, the data makes no sense in the scrambled set. Late preterms are higher than
 
 ```{r}
 NICU2 <- filtered_copy %>%
-  filter(Topic.Subgroup == "NICU Admission Rates") %>%
-  group_by(Race.Ethnicity.Category) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  filter(`Topic Subgroup` == "NICU Admission Rates") %>%
+  group_by(`Race Ethnicity Category`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate, fill = `Race Ethnicity Category`)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "NICU Admission Rates by Age Category and Race",
        x = "Race",
@@ -328,9 +327,9 @@ We can see that the rates are far higher in the scrambled data than the original
 
 ```{r}
 teen_birth2 <- filtered_copy %>%
-  filter(Topic.Subgroup == "Teen Birth Rates") %>%
-  group_by(Race.Ethnicity.Category) %>%
-  ggplot(aes(x = interaction(Indicator, Race.Ethnicity.Category), y = Rate, fill = Race.Ethnicity.Category)) +
+  filter(`Topic Subgroup` == "Teen Birth Rates") %>%
+  group_by(`Race Ethnicity Category`) %>%
+  ggplot(aes(x = interaction(Indicator, `Race Ethnicity Category`), y = Rate, fill = `Race Ethnicity Category`)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = " Teen Birth Rate Rate by Age Category and Race",
        x = "Age Category / Race",

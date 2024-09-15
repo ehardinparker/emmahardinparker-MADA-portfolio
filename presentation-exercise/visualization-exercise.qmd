@@ -112,7 +112,7 @@ gt_table
 I provided ChatGPT with the csv file contents, as well as a verbal description of what I wanted to recreate. Here was ChatGPT's original response: 
 
 ```{r}
-eu_terrorism_fatalities_by_country <- read.csv("~/Desktop/BIOS8060E/emmahardinparker-MADA-portfolio/presentation-exercise/eu_terrorism_fatalities_by_country.csv") 
+eu_terrorism_fatalities_by_country <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/presentation-exercise/eu_terrorism_fatalities_by_country.csv") 
 # Combine columns for France
 France <- eu_terrorism_fatalities_by_country$France
 
