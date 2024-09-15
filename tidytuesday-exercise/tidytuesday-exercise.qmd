@@ -445,6 +445,7 @@ total_train$total_eclipse_duration <- as.numeric(total_train$total_eclipse_durat
 # Set up CV with 5 folds
 linear_cv_total <- vfold_cv(total_train, v = 5)
 
+
 # Train and evaluate the model using CV
 linear_cv_results_total <- linear_workflow %>%
   fit_resamples(total_eclipse_duration ~ ., resamples = linear_cv_total)
@@ -455,6 +456,8 @@ linear_cv_metrics <- linear_cv_results_total %>%
 
 # Print CV metrics
 print(linear_cv_metrics)
+
+show_notes(.Last.tune.result)
 
 ```
 
