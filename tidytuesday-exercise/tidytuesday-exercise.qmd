@@ -24,7 +24,6 @@ library(glmnet)
 ```
 
 ```{r}
-setwd()
 
 eclipse_total_2024 <- read_csv(
 "~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/tidytuesday-exercise/eclipse_total_2024.csv")
@@ -456,6 +455,7 @@ linear_cv_metrics <- linear_cv_results_total %>%
 
 # Print CV metrics
 print(linear_cv_metrics)
+
 ```
 
 The RMSE value for this linear regression model is low (38.18) suggesting that the model is predicting values, on average, 39.06 seconds different from the actual values. Additionally, an R^2 value of 0.983 (98.3%) suggests that, on average, the linear regression model explains approximately 98.3% of the variability in total_eclipse_duration, which is quite high and indicates a good fit of the model to the data. 
