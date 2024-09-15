@@ -18,8 +18,6 @@ website:
             file: presentation-exercise/presentation-exercise2.qmd
           - text: "Visualization Exercise"
             file: presentation-exercise/visualization-exercise.qmd
-          - text: "Tidy Tuesday Exercise"
-            file: tidytuesday-exercise/tidytuesday-exercise.qmd
           - text: "Data Exercise"
             file: data-exercise/data-exercise.qmd
           - text: "CDC Data Exercise"
