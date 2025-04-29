@@ -1,0 +1,9 @@
+---
+title: An Analysis of the Association Between Climate Change and West Nile Virus in
+  the United States
+author: "Emma Hardin-Parker & Makenzie Hicks"
+date: "2024-11-21"
+output: pdf_document
+---
+
+

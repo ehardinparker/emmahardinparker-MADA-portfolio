@@ -1,0 +1,104 @@
+---
+title: "West Nile Virus and Climate Change"
+author: "Emma Hardin-Parker & Makenzie Hicks"
+format: pdf
+editor: visual
+---
+
+```{r}
+#| include: false
+# Load required libraries
+library(ggplot2)
+library(tidyverse)
+library(car)
+library(knitr)
+library(gt)
+library(stringr)
+library(tidyr)
+library(ggcorrplot)
+library(forecast)
+library(reshape2)
+library(RColorBrewer)
+library(cluster)
+library(rgl)
+
+# Create directories for outputs
+dir.create("outputs/main", showWarnings = FALSE)
+dir.create("outputs/supplemental", showWarnings = FALSE)
+
+getwd()
+```
+
+\newpage
+
+# Abstract
+
+# Introduction
+
+# Methodology
+
+## Historic Data
+
+### Data Introduction:
+
+```{r}
+#| echo: false
+# Load your dataset here (placeholder code)
+# data <- read.csv("path_to_your_data.csv")
+# Placeholder summary for the dataset
+summary_table <- data.frame(
+  Variable = c("Temperature", "Precipitation", "Cases"),
+  Mean = c(20.5, 50.2, 10.3),
+  SD = c(5.2, 12.4, 3.8)
+)
+```
+
+### Summary Statistics
+
+```{r}
+#| label: tbl-summary
+#| tbl-cap: "Table 1: Summary statistics of key variables related to WNV incidence."
+kable(summary_table)
+```
+
+### Yearly Trends in WNV Cases
+
+```{r}
+#| label: fig-main-trends
+#| fig-cap: "Figure 1: Yearly trends in reported WNV cases."
+# Example plot (replace with actual data and plotting code)
+main_trends_plot <- ggplot(summary_table, aes(x = Variable, y = Mean)) +
+  geom_bar(stat = "identity") +
+  ggtitle("Yearly WNV Cases Trends")
+
+# Display plot
+print(main_trends_plot)
+
+# Save figure for the main manuscript
+ggsave("outputs/main/Figure_Main_Trends.png", plot = main_trends_plot, width = 8, height = 6, dpi = 300)
+```
+
+### State-Specific Trends in WNV Cases
+
+```{r}
+#| label: fig-supp-trends
+#| fig-cap: "Figure 2: State-specific trends in reported WNV cases."
+# Example plot (replace with actual data and plotting code)
+state_trends_plot <- ggplot(summary_table, aes(x = Variable, y = SD)) +
+  geom_line() +
+  ggtitle("State-Specific WNV Cases Trends")
+
+# Display plot
+print(state_trends_plot)
+
+# Save figure for supplemental materials
+ggsave("outputs/supplemental/Figure_Supplemental_Trends.png", plot = state_trends_plot, width = 8, height = 6, dpi = 300)
+```
+
+# Results
+
+Refer to @tbl-summary for descriptive statistics and @fig-main-trends for yearly trends. Additional state-specific trends can be found in @fig-supp-trends.
+
+# Discussion
+
+# Conclusion

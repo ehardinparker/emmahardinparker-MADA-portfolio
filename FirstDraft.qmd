@@ -1,0 +1,669 @@
+---
+title: "An Analysis of the Association Between Climate Change and West Nile Virus in the United States"
+author: "Emma Hardin-Parker & Makenzie Hicks"
+format: pdf
+include-in-header: 
+      text: '\pagenumbering{arabic}'
+editor: visual
+mainfont: "Times New Roman" 
+---
+
+\newpage
+
+```{r echo=FALSE}
+#| echo: false
+library(ggplot2)
+library(tidyverse)
+library(car)
+library(knitr)
+library(gt)
+library(stringr)
+library(tidyr)
+library(ggcorrplot)
+library(forecast)
+library(reshape2)
+library(RColorBrewer)
+library(cluster)
+library(rgl)
+library(broom)
+```
+
+```{r}
+#| echo: false
+wnv_full <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/West Nile virus human neuroinvasive disease average annual incidence per 100,000 population by county of residence, 1999-2023.csv")
+```
+
+\newpage
+
+# Abstract 
+
+West Nile Virus (WNV) is a disease that was first isolated in 1937 but has continued to spread across the world, and since the outbreak from 1999-2010, it has spread across the United States.¹ As WNV has increased in recent years, it became significant to look at the possible causes, including climate change. Climate change can contribute to variations in WNV incidence by impacting vector and host factors in the spread of WNV. The analysis found no significant associations between WNV incidence and the climate change indicators chosen (drought severity, average rainfall, and average temperature). However, there were limitations to the available data, and many other contributing factors could be impacting this relationship. As climate change continues to be a prevalent issue in our world, it is important to explore how it could impact WNV incidence and, more broadly, other vector-borne disease incidence. Further research is necessary to examine the complex relationship between climate change and WNV incidence fully. 
+
+\newpage
+
+# Introduction 
+
+West Nile Virus (WNV) is a virus in the flavivirus family that is spread through the bite of an infected mosquito. The species of mosquito specifically that spreads WNV is the Culex mosquito. When a mosquito bites a bird infected with WNV, the virus enters the mosquito’s system. It then accumulates in the salivary glands, which allows it to enter a human when it takes a blood meal. There has additionally been evidence of transmission from organ donation, blood transfusion, and from mother to child via breast milk. There has been no evidence of human-human transmission.^1^
+
+The incubation period of WNV is approximately three to fourteen days long. Around 80% of infected people are asymptomatic, which can be concerning as asymptomatic individuals may not be aware that they could be transmitters of diseases. Those with symptoms can experience fever, headaches, fatigue, and nausea and vomiting. Approximately one in every 150 infected individuals experience severe disease, also known as neuroinvasive disease. Older individuals and immunocompromised individuals are at a higher risk of this. Symptoms of neuroinvasive disease include fever, tremors and convulsions, paralysis, and coma.^1^
+
+Two of the most significant issues for WNV in public health are treatment and prevention. Currently, there is no vaccine available for WNV. Because of this, mosquito control is the best way to prevent the spread of WNV. This can occur on the individual level with behaviors such as wearing insect repelling and long clothing and on the community level by reducing mosquito breeding sites. Additionally, there is no specific treatment for WNV, but supportive care is helpful. This includes treatments such as pain control, nausea medications, and rehydration therapy.² Because of this, it is important to address what is manageable, such as mosquito control. 
+
+Currently, WNV has been reported across the United States, and it typically peaks in the summer and fall months. However, epidemics are periodic, so annual rates are not consistent.^3^ Similarly, there is no uniform geographic distribution of human risk of WNV. Some geographic areas of higher risk include the west of the United States due to its relatively arid climate and high temperatures in the summer months. There are also areas east of the Mississippi River, although these are not responsible for as many cases.^4^ Geographic distribution is essential when it comes to the consideration of transmission of WNV. 
+
+According to surveillance data from 2021, WNV was the leading cause of domestically acquired arboviruses in the US. All 49 states, as well as D.C., reported cases for a total of 2,911 cases. The incidence of neuroinvasive WNV was reported as 0.61 per 100,000, and of these, 95% were hospitalized, and 11% died. This was an increase as compared to the cases from 2010 to 2020. Arizona accounted for the highest incidence of neuroinvasive disease as well as WNV in general, with over half of the cases being reported in just three counties. The highest incidence was in adults over 70 years of age compared with younger adults and in males compared with females, with incidences of 2.4 and 0.8, respectively.^5^ Given that WNV has been increasing in recent years in the US, it is important to consider the possible causes. 
+
+Climate change has been worsening in recent years, and it has been shown to be associated with WNV.^6^ Firstly, increasing global temperature has been shown to lead to an acceleration of disease incubation, mosquito development, and rates of biting all of which increase the opportunity for WNV transmission and severe disease. Additionally, WNV has been shown to correlate with drought and mild winters, but rainfall can also contribute to mosquito breeding sites. Due to climate change, drought and mild winters have become more likely. Lastly, climate change has affected bird migration and breeding patterns, which could impact the spread of the virus.^7^ Because of these factors, it is necessary to further research the association between WNV and climate change. 
+
+Studies have shown that there is a need for further research on the impacts of climate change on WNV incidence and synthesized evidence.^8^ This project aimed to directly compare WNV incidence and mortality and key climate change indicators across the United States, an area previously unexplored in literature. The indicators chosen were drought severity, average precipitation, and average temperature. It also aimed to explore further how climate change indicators have impacted the incidence of neuroinvasive WNV. These data sets could demonstrate the need for further research into WNV and climate change and increased prevention and intervention methods. In the future, it could potentially drive further research into other vector-borne diseases and guide climate change policy. 
+
+\newpage 
+
+# Methods
+
+## Data Collection & Manipulation
+
+### Data Transformation 
+Cumulative historic WNV incidence data were collected from the Center for Disease Control and Prevention’s (CDC) ArboNET surveillance system for 1993-2023. The data includes reported average annual neuroinvasive WNV incidence by county.^9^  High-risk criteria were implemented to determine counties and states of interest for further study. Counties with an average annual incidence greater than five and states with an average annual incidence greater than one were included in further analysis. After implementing the high-risk criteria, we created a high-risk county dataset including 114 counties and a high-risk state dataset with 12 states. 
+
+### CCI Inclusion 
+The months of illness onset dataset was used to determine the months most appropriate for CCI analysis. We focused on July-September for our CCI data as they had the highest reported cases. CCI data points on average temperature (°F), precipitation (in), and drought severity (PDSI) were manually entered into the high-risk county dataset. The National Integrated Drought Information System defines the Palmer Drought Severity Index based on a simplified soil-water balance. Values greater than 4 indicate very wet conditions, and values less than -4 indicate arid conditions.^11^ Due to data engine limitations, average precipitation and temperature data points were accessed from July to September, and drought severity data points were used for August. 
+
+### Yearly WNV Data Collection 
+Yearly data were also collected from the ArboNET surveillance system for 2000-2023.^9^ These datasets include stratified WNV case reports by activity type and county.^9^ Activity type here is defined by the following: Non-human activity indicates that veterinary disease cases or infections in mosquitoes, birds, or sentinel animals have been reported to the CDC; Human infections indicate that human disease cases or infections in blood donors have been reported to the CDC, and Human infections and non-human activity: indicates that both human infections and non-human infections have been reported to the CDC.^9^ Climate Change Indicator (CCI) data were sourced from the NOAA National Centers for Environmental Information (NCEI).^10^ The Climate at a Glance Time Series Engine was utilized to individually source data points on average temperature, average precipitation, and drought severity for counties of interest.^10^ Finally, we accessed a small .csv file from the ArboNET surveillance system that outlined reported WNV cases by month of illness onset.^9^
+
+## Statistical Analysis 
+
+Three main statistical analysis techniques were conducted in RStudio v. 4.4.1 to assess potential relationships between CCIs and the incidence of WNV. K-means clustering analyses were calculated to assess the strength of the relationships between WNV incidence and environmentally similar countries. Simple and multiple linear regression models were built to predict WNV incidence, adjusting for CCIs. Correlation analyses were conducted to explore relationships between WNV incidence and various CCIs for our 114 high risk counties. Additionally, we conducted a novel Anomaly analysis to determine specific relationships between Temperature Anomalies and WNV incidence among high-risk counties. 
+
+\newpage
+
+## Results
+
+### Descriptive Statistics & Definining High-Risk Criteria 
+
+```{r include=FALSE}
+#| echo: false
+# Histogram of incidence rates
+dist_inc_all <- ggplot(wnv_full, aes(x = Incidence)) +
+  geom_histogram(binwidth = 0.5, fill = "steelblue", color = "black") +  
+  labs(title = "Distribution of WNV Incidence Rates", 
+       x = "Incidence Rate per 100,000", 
+       y = "Frequency") +  # Add descriptive axis labels
+  theme_minimal() +  # Clean theme for a professional look
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  
+    axis.title = element_text(size = 12, face = "bold"),  
+    axis.text = element_text(size = 10)  
+  )
+
+# Save the specific plot
+ggsave("Distribution_Incidence_Rates.png", plot = dist_inc_all, width = 6, height = 4, dpi = 300)
+
+```
+
+
+![Distribution of WNV Incidence Rates](Distribution_Incidence_Rates.png)
+
+Figure 1 shows the distribution of WNV incidence rates by county from 1993-2023. This plot is incredibly right-skewed. The distribution of this plot motivated us to create high risk criteria to simplify our analyses and focus on counties that have pre-existing high WNV incidence. After exploring the data, we decided to include all counties with an incidence greater than 5. 
+
+```{r include=FALSE}
+#| echo: false
+# Filter counties with high incidence rates (e.g., incidence rate > 5)
+high_risk_counties <- wnv_full %>%
+  filter(Incidence > 5) %>%
+  arrange(desc(Incidence)) %>%
+  select(-Legend, -County)
+
+# Histogram of incidence rates
+highriskhist <- ggplot(high_risk_counties, aes(x = Incidence)) +
+  geom_histogram(binwidth = 0.5, fill = "steelblue", color = "black") +  
+  labs(title = "Distribution of WNV Incidence Rates: High-Risk Counties", 
+       x = "Incidence Rate per 100,000", 
+       y = "Frequency") +  # Add descriptive axis labels
+  theme_minimal() +  # Clean theme for a professional look
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  
+    axis.title = element_text(size = 12, face = "bold"),  
+    axis.text = element_text(size = 10)  
+  )
+
+# Save the specific plot
+ggsave("High_Risk_Incidence.png", plot = highriskhist, width = 6, height = 4, dpi = 300)
+```
+
+![Distibution of High Risk Counties WNV Incidence Rates](High_Risk_Incidence.png)
+
+Figure 2 shows the distribution of WNV incidence rates by high-risk counties from 1993-2023. Though the plot is still postiviely skewed, we felt more comfortable about the distribution moving forward. We were left with 114 total counties. Moving forward, we wanted to find our high-risk criteria for state-level data, as well as cross-reference our two newly created datasets to see if there were any discrepancies of counties determined to be high-risk existing in states not considered high-risk. 
+
+
+
+```{r include=FALSE}
+#| echo: false
+# Summarize average incidence rate by state
+state_summary <- wnv_full %>%
+  group_by(State = substr(FullGeoName, 1, 2)) %>%
+  summarize(mean_incidence = mean(Incidence, na.rm = TRUE),
+            total_population = sum(Population))
+
+high_risk_states <- state_summary %>%
+  filter(mean_incidence > 1) %>%
+  arrange(desc(mean_incidence))
+
+table_3 <- high_risk_states %>%
+  gt() %>%
+  tab_header(
+    title = "High Risk States: WNV Incidence",
+    subtitle = "Summary of High Risk States (Incidence > 1)"
+  ) %>%
+  fmt_number(
+    columns = c(mean_incidence),  
+    decimals = 4
+  ) %>%
+  cols_label(
+    State = "State",
+    mean_incidence = "Mean Incidence"
+  ) %>%
+  tab_style(
+    style = list(
+      cell_text(weight = "bold")
+    ),
+    locations = cells_column_labels()
+  ) %>%
+  tab_caption("Table 1: Mean Incidence of High-Risk States") %>% 
+  tab_options(
+    table.width = pct(100),  # Make table full-width
+    column_labels.font.size = px(14),  # Increase column label font size
+    table.font.size = px(12)  # Set font size for the table content
+  )
+
+# Save the table as a PNG file
+gtsave(table_3, "Table3_HighStateStatistics.png")
+```
+
+![: WNV Mean Incidence by High Risk State](Table3_HighStateStatistics.png)
+Table 1 shows the distribution of WNV incidence rates by states defined as high-risk from 1993-2023. The initial WNV Incidence values from all 50 states ranged from 0.01 to 5.3. We elected to subset the data to only include states with an incidence value greater than one. The table above outlines the mean WNV incidence spanning the 12 high-risk states. The mean incidence values range from approximately 1 to 5.3 cases per 100,000. After cross-referencing the newly formed high-risk counties dataset and the high-risk states dataset, we found that all high-risk counties are within the 12 high-risk states listed above. All analyses were conducted using these 12 states and the 114 individual high-risk counties within these states. 
+
+### Case Activity 
+
+These data were individually downloaded from the [CDC Historic Data](https://www.cdc.gov/west-nile-virus/data-maps/historic-data.html). Each individual data set contained information on the number of cases reported, their activity type, case type, and corresponding county. Activity type here is defined by the following: **Non-human activity**: indicates that veterinary disease cases or infections in mosquitoes, birds, or sentinel animals have been reported to the CDC, **Human infections**: indicates that human disease cases or infections in blood donors have been reported to the CDC, and **Human infections and non-human activity**: indicates that both human infections and non-human infections have been reported to the CDC. These data sets were individually aggregated and written into a .csv file for future use. 
+
+```{r include=FALSE}
+#| echo: false
+getwd()
+
+file_path <- "/Users/ehardinparker/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/yearly"
+
+
+# List all files that match the pattern for yearly cases (e.g., '2000cases.csv', '2001cases.csv', etc.)
+file_list <- list.files(path = file_path, pattern = "\\d{4}cases.csv", full.names = TRUE)
+
+# Read and merge all files into a single dataframe and rename the dataset to 'yearly_wnv'
+yearly_wnv <- do.call(rbind, lapply(file_list, read.csv))
+
+# View the combined dataset
+head(yearly_wnv)
+
+# Save the combined dataset if needed
+write.csv(yearly_wnv, "yearly_wnv_combined.csv", row.names = FALSE)
+
+yearly_wnv_combined <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/yearly_wnv_combined.csv")
+
+# Create a grouped summary by Activity 
+case_summary <- yearly_wnv %>%
+  group_by(Activity) %>%
+  summarize(Count = n())
+
+# Calculate the percentage of each case type
+case_summary <- case_summary %>%
+  mutate(Percentage = round(Count / sum(Count) * 100, 1))  
+
+# Create the pie chart
+pie <- ggplot(case_summary, aes(x = "", y = Count, fill = Activity)) +
+  geom_bar(stat = "identity", width = 1, color = "white") +  
+  coord_polar(theta = "y") +  
+  geom_text(aes(label = paste0(Percentage, "%")), 
+            position = position_stack(vjust = 0.5), size = 5, color = "white") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  labs(title = "Distribution of Case Reports by Type") + 
+  theme_void() + 
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 7, face = "bold"),  
+    legend.title = element_blank(),  
+    legend.text = element_text(size = 6) 
+  )
+
+# Save the specific plot
+ggsave("pie.png", plot = pie, width = 5, height = 3, dpi = 300)
+```
+
+![Case Activity Type](pie.png)
+
+### Distribution of Case Activity Over Time 
+
+```{r include=FALSE}
+#| echo: false
+
+# Summarize the number of each activity type per year
+activity_summary <- yearly_wnv %>%
+  group_by(Year, Activity) %>%
+  summarize(count = n()) %>%
+  ungroup()
+
+# Plot to compare activity types with professional styling
+time <- ggplot(activity_summary, aes(x = Year, y = count, fill = Activity)) +
+  geom_bar(stat = "identity", position = "dodge", color = "black") +  # Add black borders to bars
+  labs(title = "WNV Human Infections vs. Non-Human Activity Over Time",
+       x = "Year", y = "Cases by Activity") +
+  scale_fill_brewer(palette = "Set2") +  # Apply a professional color palette
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 11, face = "bold"),  # Center and bold the title
+    axis.title.x = element_text(size = 10),  # Increase font size for x-axis title
+    axis.title.y = element_text(size = 10),  # Increase font size for y-axis title
+    axis.text = element_text(size = 8),  # Increase axis text size
+    legend.title = element_text(size = 5),  # Increase legend title size
+    legend.position = "top",  # Move the legend to the top
+    legend.text = element_text(size = 6),  # Increase legend text size
+    panel.grid.major = element_line(color = "gray80", size = 0.5),  # Subtle major gridlines
+    panel.grid.minor = element_blank()  # Remove minor gridlines
+  )
+
+# Save the specific plot
+ggsave("time.png", plot = time, width = 5, height = 3, dpi = 300)
+```
+
+![Distibution of Case Activity Type over Time](time.png)
+
+Figures 3 and 4 shown above were created to show the distribution of case activity over time and determine the percentages of each activity type. Due to the role of mosquitoes and other animals in human contraction of WNV, we expected non-human activity to have the highest rate of all cases and the most cases over time.^9^ The CDC broadly defines these categories; however, we found distinguishing case counts between the activity types essential. 
+
+
+### Motivation for CCI Analysis 
+
+```{r include=FALSE}
+#| echo: false
+years_illness_onset <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/years_illness_onset.csv")
+
+# Reorder the Month column as a factor with levels in calendar order
+years_illness_onset$Month <- factor(years_illness_onset$Month, 
+                                    levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                                               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+
+# Create a bar plot and add the numbers on top of each bar
+years <- ggplot(years_illness_onset, aes(x = Month, y = Reported.Cases, fill = Month)) +
+  geom_bar(stat = "identity", color = "black") +  # Create a bar plot with black borders
+  geom_text(aes(label = Reported.Cases), vjust = -0.5, size = 2.5) +  # Add the case numbers on top of the bars
+  labs(title = "WNV Illness Onset by Month (1999-2023)", 
+       x = "Month of Illness Onset", 
+       y = "Reported Cases") +  # Add meaningful labels
+  theme_minimal() +  # Apply a minimal, clean theme
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 13, face = "bold"),  # Center and bold the title
+    axis.title = element_text(size = 9, face = "bold"),  # Bold axis titles
+    axis.text = element_text(size = 9),  # Increase axis text size
+    legend.position = "none"  # Remove the legend
+  ) +
+  scale_fill_brewer(palette = "BrBG")  # Use a color palette for better aesthetics
+
+# Save the specific plot
+ggsave("years.png", plot = years, width = 5, height = 3, dpi = 300)
+```
+![Years of WNV Illness Onset](years.png)
+
+Figure 5 shows the distribution of the Months of Illness Onset data file accessed from the CDC. The distribution justifies our decision to proceed with the July-September time frame for CCI analysis, given that the data are approximately normally distributed around August and September. Due to time constraints and complexities with accessing CCI data points, we decided it was most appropriate to focus on environmental conditions data for the months where WNV illness onset was highest from 1993 to 2023. 
+
+### Correlation Analysis 
+
+```{r include=FALSE}
+#| echo: false
+
+high_risk_counties$Average_Temperature <- c(81.3,69.3,80.0, 68.5, 70.2, 67.8, 69.3, 65.8, 67.5, 68.1, 68.2, 70.0, 67.9, 70.0, 67.3, 64.4, 67.9, 65.5, 66.1, 69.8, 72.2, 65.4, 77.9, 69.4, 73.3, 71.3, 77.5, 70.6, 66.6, 71.2, 69.8, 75.8, 73.4, 70.3, 69.8, 71.2, 67.7, 69.4, 66.5, 70.4, 71.9, 70.9, 66.3, 71.8, 77.0, 71.2, 72.0, 63.5, 67.3, 66.9, 69.0, 68.8, 67.5, 68.9, 64.8, 80.1, 79.7, 70.4, 71.9, 78.1, 66.8, 70.8, 66.5, 64.6, 64.4, 68.8, 69.9, 77.2, 68.8, 67.7, 69.9, 72.5, 71.1, 70.6, 72.0, 65.3, 64.9, 81.7, 67.3, 67.8, 72.0, 72.8, 70.9, 66.9, 68.9, 67.4, 66.7, 69.9, 66.1, 76.1, 72.8, 71.2, 71.8, 65.7, 70.2, 70.2, 73.0, 67.6, 77.4, 67.0, 65.3, 76.8, 70.5, 68.0, 76.1, 67.7, 71.4, 71.1, 66.4, 71.0, 66.6, 71.3, 65.9, 75.3)
+
+high_risk_counties$Average_Precipitation <- 
+  c(6.94, 6.22, 5.93, 5.13, 8.39, 3.62, 7.51, 6.19, 4.10, 6.98, 4.18, 7.74, 7.37, 7.65, 5.11, 4.70, 6.99, 7.55, 5.36, 8.56, 6.45, 4.22, 7.29, 6.47, 8.67, 6.27, 7.09, 8.45, 6.61, 6.40, 6.35, 7.07, 8.02, 7.27, 6.59, 8.76, 8.36, 4.59, 8.84, 7.89, 5.78, 8.41, 9.23, 7.02, 7.25, 8.03, 5.95, 3.74, 8.66, 1.41, 7.85, 9.61, 8.99, 7.81, 6.50, 7.21, 8.88, 8.89, 7.06, 4.83, 9.46, 7.44, 3.89, 7.76, 7.82, 5.76, 7.07, 7.30, 7.91, 5.09, 9.20, 5.62, 5.23, 9.19, 7.35, 8.02, 7.17, 4.39, 4.89, 9.21, 6.27, 8.13, 9.39, 6.20, 7.19, 8.74, 8.68, 8.01, 6.78, 5.09, 6.26, 9.56, 7.99, 8.11, 8.84, 8.28, 6.76, 7.50, 6.49, 6.11, 7.44, 5.46, 9.12, 6.67, 1.26, 8.49, 5.43, 5.28, 8.91, 6.22, 6.00, 5.99, 6.47, 7.40)
+
+high_risk_counties$Drought_Severity <- c(-0.37, 1.58, -0.55, -0.21, 2.93, 1.18, 1.49, 0.89, 0.72, 2.26, -1.05, 1.43, 2.36, 2.51, 0.37, 0.35, 1.74, 2.80, -0.03, 2.41, -0.12, 0.66, 0.14, 2.43, 1.77, 0.35, -1.06, 1.94, 1.38, 2.16, 0.36, -0.33, -0.30, 1.13, 0.97, 1.80, 1.50, 2.34, -1.64, 1.84, 0.86, -1.24, 2.50, 1.31, 0.04, 2.55,  0.29, 0.44, -1.40, 2.79, -0.95, 2.62, 2.06, 2.26, 1.29, -0.57, 0.53, 0.64, 1.35, -0.31, 0.98, 1.04, 2.40, -0.12, 1.58, 1.76, 0.91, 0.17, 1.83,  2.09, 0.83, 0.17, 1.70, 0.46, 1.48, 2.76, 2.25, -0.41, -2.67, -0.78, 0.71, -0.63, 1.71, 1.48, 0.58, 2.04, 2.22, 2.53, 2.15, -1.30, -0.88, 0.50, 1.05, 1.84, 1.34, 1.98, 1.60, 2.06, 0.14, 1.42, 0.64, 0.55, 1.73, 1.89, -1.01, -1.75, 1.73, -1.55, -0.93, 1.54, 0.73, -0.89, 0.52, -0.33)
+# Correlation matrix
+cor_matrix <- high_risk_counties %>%
+  select(Incidence, Average_Temperature, Average_Precipitation, Drought_Severity) %>%
+  cor()
+
+cor_matrix
+
+# Select relevant columns for correlation analysis
+cor_data <- high_risk_counties %>%
+  select(Incidence, Average_Temperature, Average_Precipitation, Drought_Severity)
+
+# Recalculate correlation matrix after ensuring no missing values or incorrect types
+cor_matrix <- cor(cor_data, use = "pairwise.complete.obs")
+
+# Melt the correlation matrix to long format for ggplot
+melted_cor_matrix <- melt(cor_matrix)
+
+# Rename the variables to remove underscores
+melted_cor_matrix$Var1 <- gsub("_", " ", melted_cor_matrix$Var1)
+melted_cor_matrix$Var2 <- gsub("_", " ", melted_cor_matrix$Var2)
+
+# Create the heatmap using ggplot2
+cor <- ggplot(data = melted_cor_matrix, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "red", high = "blue", mid = "white", 
+                       midpoint = 0, limit = c(-1, 1), space = "Lab", 
+                       name = "Correlation") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  coord_fixed() +
+  geom_text(aes(label = round(value, 2)), color = "black", size = 2.5) +
+  labs(title = "Correlation Heatmap CCIs and WNV Incidence", x = "", y = "")
+
+# Save the specific plot
+ggsave("cor.png", plot = cor, width = 5, height = 3, dpi = 300)
+```
+
+![Correlation Analysis of CCIs by County](cor.png)
+
+
+The above correlation plot shows no evidence of significant correlation between CCI indicators and WNV incidence. Moving forward, we elected to try other analysis techniques to see if we can find more nuanced connections between these indicators of Climate Change and WNV incidence for our 114 high risk counties. 
+
+
+### Clustering Analysis 
+
+We performed a k-means clustering analysis on this data to explore patterns among similar counties, relationships between drought severity, average temperature, and precipitation with WNV incidence, and identify risk groups among three clusters. These clusters were created and assigned directly through R. 
+
+```{r include=FALSE}
+#| echo: false
+#| 
+
+high_risk_counties$Average_Temperature <- c(81.3,69.3,80.0, 68.5, 70.2, 67.8, 69.3, 65.8, 67.5, 68.1, 68.2, 70.0, 67.9, 70.0, 67.3, 64.4, 67.9, 65.5, 66.1, 69.8, 72.2, 65.4, 77.9, 69.4, 73.3, 71.3, 77.5, 70.6, 66.6, 71.2, 69.8, 75.8, 73.4, 70.3, 69.8, 71.2, 67.7, 69.4, 66.5, 70.4, 71.9, 70.9, 66.3, 71.8, 77.0, 71.2, 72.0, 63.5, 67.3, 66.9, 69.0, 68.8, 67.5, 68.9, 64.8, 80.1, 79.7, 70.4, 71.9, 78.1, 66.8, 70.8, 66.5, 64.6, 64.4, 68.8, 69.9, 77.2, 68.8, 67.7, 69.9, 72.5, 71.1, 70.6, 72.0, 65.3, 64.9, 81.7, 67.3, 67.8, 72.0, 72.8, 70.9, 66.9, 68.9, 67.4, 66.7, 69.9, 66.1, 76.1, 72.8, 71.2, 71.8, 65.7, 70.2, 70.2, 73.0, 67.6, 77.4, 67.0, 65.3, 76.8, 70.5, 68.0, 76.1, 67.7, 71.4, 71.1, 66.4, 71.0, 66.6, 71.3, 65.9, 75.3)
+
+high_risk_counties$Average_Precipitation <- 
+  c(6.94, 6.22, 5.93, 5.13, 8.39, 3.62, 7.51, 6.19, 4.10, 6.98, 4.18, 7.74, 7.37, 7.65, 5.11, 4.70, 6.99, 7.55, 5.36, 8.56, 6.45, 4.22, 7.29, 6.47, 8.67, 6.27, 7.09, 8.45, 6.61, 6.40, 6.35, 7.07, 8.02, 7.27, 6.59, 8.76, 8.36, 4.59, 8.84, 7.89, 5.78, 8.41, 9.23, 7.02, 7.25, 8.03, 5.95, 3.74, 8.66, 1.41, 7.85, 9.61, 8.99, 7.81, 6.50, 7.21, 8.88, 8.89, 7.06, 4.83, 9.46, 7.44, 3.89, 7.76, 7.82, 5.76, 7.07, 7.30, 7.91, 5.09, 9.20, 5.62, 5.23, 9.19, 7.35, 8.02, 7.17, 4.39, 4.89, 9.21, 6.27, 8.13, 9.39, 6.20, 7.19, 8.74, 8.68, 8.01, 6.78, 5.09, 6.26, 9.56, 7.99, 8.11, 8.84, 8.28, 6.76, 7.50, 6.49, 6.11, 7.44, 5.46, 9.12, 6.67, 1.26, 8.49, 5.43, 5.28, 8.91, 6.22, 6.00, 5.99, 6.47, 7.40)
+
+high_risk_counties$Drought_Severity <- c(-0.37, 1.58, -0.55, -0.21, 2.93, 1.18, 1.49, 0.89, 0.72, 2.26, -1.05, 1.43, 2.36, 2.51, 0.37, 0.35, 1.74, 2.80, -0.03, 2.41, -0.12, 0.66, 0.14, 2.43, 1.77, 0.35, -1.06, 1.94, 1.38, 2.16, 0.36, -0.33, -0.30, 1.13, 0.97, 1.80, 1.50, 2.34, -1.64, 1.84, 0.86, -1.24, 2.50, 1.31, 0.04, 2.55,  0.29, 0.44, -1.40, 2.79, -0.95, 2.62, 2.06, 2.26, 1.29, -0.57, 0.53, 0.64, 1.35, -0.31, 0.98, 1.04, 2.40, -0.12, 1.58, 1.76, 0.91, 0.17, 1.83,  2.09, 0.83, 0.17, 1.70, 0.46, 1.48, 2.76, 2.25, -0.41, -2.67, -0.78, 0.71, -0.63, 1.71, 1.48, 0.58, 2.04, 2.22, 2.53, 2.15, -1.30, -0.88, 0.50, 1.05, 1.84, 1.34, 1.98, 1.60, 2.06, 0.14, 1.42, 0.64, 0.55, 1.73, 1.89, -1.01, -1.75, 1.73, -1.55, -0.93, 1.54, 0.73, -0.89, 0.52, -0.33)
+
+# Scaling the data before clustering
+scaled_data <- scale(high_risk_counties %>% select(Incidence, Average_Temperature, Average_Precipitation, Drought_Severity))
+
+# Perform k-means clustering with 3 clusters
+set.seed(123)
+kmeans_result <- kmeans(scaled_data, centers = 3, nstart = 25)
+
+# Add cluster assignment to the original data
+high_risk_counties$cluster <- as.factor(kmeans_result$cluster)
+
+
+# Improved plot for Incidence vs. Temperature with clustering
+temp <- ggplot(high_risk_counties, aes(x = Average_Temperature, y = Incidence, color = factor(cluster))) +
+  geom_point(size = 3, alpha = 0.7) +  # Larger points with some transparency
+  scale_color_manual(values = c("red", "green", "blue")) +  # Custom colors for clusters
+  labs(
+    title = "Clustering of Counties Based on WNV Incidence and Temperature",
+    x = "Average Temperature (°F)",  # Add units to labels
+    y = "WNV Incidence",
+    color = "Cluster"  # Cleaner legend title
+  ) +
+  theme_minimal() +  # Clean theme
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 9, face = "bold"),  # Center title
+    axis.text = element_text(size = 7),  # Bigger axis labels
+    axis.title = element_text(size = 7),  # Bigger axis titles
+    legend.position = "right"  # Position the legend
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 3)))  # Larger legend points
+
+# Save the specific plot
+ggsave("temp.png", plot = temp, width = 5, height = 3, dpi = 300)
+```
+
+![Incidence v. Temperature with Clustering](temp.png)
+
+Figure 6 above shows clustering between the relationship of WNV incidence and average temperature. From the plot above, we can determine that counties with higher average temperatures (cluster three) between July and September experience more variability in WNV incidence, while counties with lower average temperatures consistently show lower WNV incidence, except for the variability seen in cluster one. The distinct cluster separations highlight patterns that indicate that temperature may be essential in explaining the variability of WNV incidence across different regions. 
+
+
+```{r include=FALSE}
+#| echo: false
+
+# Plot for Precipitation
+precip <- ggplot(high_risk_counties, aes(x = Average_Precipitation, y = Incidence, color = factor(cluster))) +
+  geom_point(size = 3, alpha = 0.7) +
+  scale_color_manual(values = c("red", "green", "blue")) +
+  labs(
+    title = "Clustering of Counties Based on WNV Incidence and Precipitation",
+    x = "Average Precipitation (inches)",
+    y = "WNV Incidence",
+    color = "Cluster"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 9, face = "bold"),
+    axis.text = element_text(size = 7),
+    axis.title = element_text(size = 7),
+    legend.position = "right"
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 3)))
+
+# Save the specific plot
+ggsave("precip.png", plot = precip, width = 5, height = 3, dpi = 300)
+```
+
+![Incidence v. Precipitation with Clustering](precip.png)
+
+
+The clustering above suggests that precipitation alone may not fully explain the variation in WNV incidence. The three clusters show varied relationships between precipitation levels and WNV incidence, indicating that multiple environmental or demographic factors might be driving the conflicting patterns. 
+
+
+```{r include=FALSE}
+#| echo: false
+
+# Plot for Drought Severity
+drought <- ggplot(high_risk_counties, aes(x = Drought_Severity, y = Incidence, color = factor(cluster))) +
+  geom_point(size = 3, alpha = 0.7) +
+  scale_color_manual(values = c("red", "green", "blue")) +
+  labs(
+    title = "Clustering of Counties Based on WNV Incidence and Drought Severity",
+    x = "Drought Severity",
+    y = "WNV Incidence",
+    color = "Cluster"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 9, face = "bold"),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 7),
+    legend.position = "right"
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 3)))
+
+# Save the specific plot
+ggsave("drought.png", plot = drought, width = 5, height = 3, dpi = 300)
+```
+
+![Incidence v. Drought with Clustering](drought.png)
+
+From the above plot, we can conclude that higher drought severity indicated by negative values is clustered with moderate to lower WNV incidence, suggesting that extreme drought does not always correlate with an increase in WNV incidence. Additionally, counties that experience less severe or no drought around zero show a wider range of WNV incidence, indicating no significant relationship between drought severity and WNV incidence. However, it should be noted that drought severity data was only accessed for August, and data limitations may have affected the significance of this particular analysis. 
+
+### Analysis of Variance
+
+```{r include=FALSE}
+#| echo: false
+
+# Calculate the average case types (reported cases, neuroinvasive, blood donor) by county
+yearly_wnv_averages <- yearly_wnv %>%
+  group_by(FullGeoName) %>%
+  summarize(
+    avg_reported_cases = mean(Reported.human.cases, na.rm = TRUE),
+    avg_neuroinvasive_cases = mean(Neuroinvasive.disease.cases, na.rm = TRUE),
+    avg_blood_donor_cases = mean(Identified.by.Blood.Donor.Screening, na.rm = TRUE)
+  ) %>%
+  mutate(avg_total_case = avg_reported_cases + avg_neuroinvasive_cases + avg_blood_donor_cases)
+
+
+# Merge the averages with the high-risk counties dataset (without Year)
+combined_data <- merge(high_risk_counties, yearly_wnv_averages, by = "FullGeoName")
+
+
+# Run ANOVA
+aov_result <- aov(Incidence ~ factor(cluster), data = combined_data)
+
+# Get summary of ANOVA
+anova_summary <- summary(aov_result)
+
+# Extract ANOVA table values
+table_4 <- data.frame(
+  Term = c("factor(cluster)", "Residuals"),
+  Df = c(anova_summary[[1]]$Df[1], anova_summary[[1]]$Df[2]),
+  `Sum_Sq` = c(anova_summary[[1]]$`Sum Sq`[1], anova_summary[[1]]$`Sum Sq`[2]),
+  `Mean_Sq` = c(anova_summary[[1]]$`Mean Sq`[1], anova_summary[[1]]$`Mean Sq`[2]),
+  `F_value` = c(anova_summary[[1]]$`F value`[1], "-"),
+  `Pr_F` = c(anova_summary[[1]]$`Pr(>F)`[1], "-")
+)
+
+# Load gt package for formatting
+library(gt)
+
+# Convert `table_4` to a `gt` table
+gt_table_4 <- table_4 %>%
+  gt() %>%
+  tab_header(
+    title = "ANOVA Results for WNV Incidence Across Clusters"
+  ) %>%
+  cols_label(
+    Term = "Term",
+    Df = "Degrees of Freedom",
+    Sum_Sq = "Sum of Squares",
+    Mean_Sq = "Mean Squares",
+    F_value = "F Value",
+    Pr_F = "p-value"
+  ) %>%
+  fmt_number(
+    columns = c(Df, Sum_Sq, Mean_Sq, F_value, Pr_F),
+    decimals = 3
+  ) %>%
+  tab_options(
+    table.font.size = 12,
+    heading.align = "center"
+  )
+
+# Save the formatted table as a PNG file
+gtsave(gt_table_4, "Table4_ANOVA.png")
+
+
+```
+
+![ANOVA Results post-Clustering](Table4_ANOVA.png)
+
+Following the k-means cluster analysis, we performed an analysis of variance test to determine whether there was a statistically significant difference in WNV incidence across the three clusters. From this ANOVA test, we can determine that although average temperature, participation, and drought severity were used to cluster counties in similar environmental conditions, the three clusters do not significantly differ regarding WNV incidence (F = 2.077, p = 0.13). 
+
+### Regression Analysis 
+
+```{r include=FALSE}
+#| echo: false
+
+lm1 <- lm(Incidence ~ Average_Temperature, data = combined_data)
+summary(lm1)
+
+lm2 <- lm(Incidence ~ Average_Precipitation, data = combined_data)
+summary(lm2)
+
+lm3 <- lm(Incidence ~ Drought_Severity, data = combined_data)
+summary(lm3)
+
+lm4 <- lm(Incidence ~ Average_Temperature + Average_Precipitation + Drought_Severity, data = combined_data  )
+summary(lm4)
+
+create_model_table <- function(model, title, filename) {
+  # Get the summary of the model using broom::tidy()
+  model_summary <- tidy(model)
+  
+  # Get the residual statistics
+  glance_summary <- glance(model)
+  
+  # Create and save a professional table using gt
+  gt_table <- model_summary %>%
+    gt() %>%
+    tab_header(
+      title = title
+    ) %>%
+    cols_label(
+      term = "Term",
+      estimate = "Estimate",
+      std.error = "Std. Error",
+      statistic = "t Value",
+      p.value = "p-Value"
+    ) %>%
+    fmt_number(
+      columns = vars(estimate, std.error, statistic, p.value),
+      decimals = 3
+    ) %>%
+    tab_source_note(
+      source_note = paste("Residual standard error:", round(glance_summary$sigma, 3), 
+                          "| R-squared:", round(glance_summary$r.squared, 3),
+                          "| Adjusted R-squared:", round(glance_summary$adj.r.squared, 3),
+                          "| F-statistic:", round(glance_summary$statistic, 3), 
+                          "| p-value:", round(glance_summary$p.value, 3))
+    )
+  
+  # Save the table
+  gtsave(gt_table, filename)
+}
+
+# Generate and save each table
+create_model_table(lm1, "Model 1: WNV Incidence ~ Average Temperature", "Model1_Temperature.png")
+create_model_table(lm2, "Model 2: WNV Incidence ~ Average Precipitation", "Model2_Precipitation.png")
+create_model_table(lm3, "Model 3: WNV Incidence ~ Drought Severity", "Model3_Drought.png")
+create_model_table(lm4, "Model 4: WNV Incidence ~ All Variables", "Model4_AllVariables.png")
+
+
+
+
+```
+
+##### Model 1: WNV Incidence ~ Average Temperature
+
+![Model 1: WNV Incidence ~ Average Temperature](Model1_Temperature.png)
+
+##### Model 2: WNV Incidence ~ Average Precipitation
+
+![Model 2: WNV Incidence ~ Average Precipitation](Model2_Precipitation.png)
+
+##### Model 3: WNV Incidence ~ Drought Severity
+
+![Model 3: WNV Incidence ~ Drought Severity](Model3_Drought.png)
+
+##### Model 4: WNV Incidence ~ All Variables
+
+![Model 4: WNV Incidence ~ All Variables](Model4_AllVariables.png)
+
+We conducted simple linear regression models for average temperature, precipitation, and drought severity on WNV incidence and found no statistically significant effects. We then performed a multiple regression model to determine whether multiple CCI predictors significantly predicted WNV incidence. However, the model above suggests otherwise. None of the CCI displayed above appear significant, with p-values well above the significance threshold of 0.05. Additionally, the R-squared value of 0.03317 indicates that the three CCIs together only explain 3.3% of the variation in WNV incidence. 
+
+
+### Novel Anomaly Analysis 
+
+According to the NCEI, temperature anomalies are more important than the average baseline temperature as positive values indicate warmer than baseline and negative values indicate cooler than baseline. We elected to analyze the temperature anomalies of high risk states and WNV incidence to account for the broad geographic region of these states. We posited that analyzing the "out of the norm" temperature trends would provide greater insight into the relationship between Temperature and WNV Incidence. 
+
+![WNV and Temperature Anomaly](WNV_Incidence_vs_Temperature_Anomaly.png)
+As shown by the figure above, there is a weak positive relationship between Temperature Anomaly and WNV Incidence. This further suggests that higher average temperature and subsequent positive temperature anomalies may influence WNV incidence. 
+
+
+
+\newpage
+
+# Discussion 
+
+Initial descriptive results of this study indicate that both WNV incidence and specifically neuroinvasive incidence have been increasing in recent years. However, further statistical tests also indicated that there was no significant correlation between WNV and the CCIs chosen, which were drought severity, average precipitation, and average temperature. Our results did show that counties with higher average temperatures during peak months of WNV experienced a higher variability in incidence, which may indicate some seasonal fluctuations in mosquito activity and/or viral transmission. Additionally, results showed a slight positive relationship between temperature anomaly and WNV incidence. Overall, our studies did not find any substantial relationship between CCIs and WNV, but they did show some possibility of a relationship between temperature and WNV incidence. While these results were unexpected, they are consistent with our current knowledge of WNV and climate change.
+
+Our study results do not entirely contradict current research surrounding WNV incidence and climate change, but current research can also help to explain part of why our results were not significant, Current research has indicated that climate change has impacted mosquitoes (vector) and birds (host),^7^ which both have the potential to affect WNV transmission and could confound the relationships we examined. Additionally, many other factors can affect these two important aspects of WNV transmission including community and individual behaviors. Another aspect is that WNV incidence is highly variable from year to year due to factors such as the seasonality of vectors, varying surveillance, and changing human activity¹², so it can be difficult to truly assess the relationship across years without consistent WNV incidence rates and the introduction of multiple confounders. 
+
+## Research Implications
+
+While our results did not show any significant associations, they are important in that they contribute to the current knowledge surrounding WNV and climate change. Our research serves as a basis that can guide other research by displaying the need for further exploration of possible confounders. We also adequately display the complexity of the relationship between WNV and climate change as both topics individually require exploration of several factors and their interactions are equally as difficult to establish. However, this study was subject to several limitations that affect the implications of our research.  
+
+## Strengths and Limitations
+
+It should be noted that the CDC itself reported limitations of using ArboNET surveillance data. The following limitations were accessed from the CDC Historic Data WebPage and are reported here for inclusion in our limitation section. Firstly, the CDC reports that under-reporting is a common limitation to all surveillance systems that solely rely on healthcare providers to consider the disease (WNV) as a possible diagnosis, obtain the proper laboratory tests, and report confirmed diagnoses to public health authorities. Secondly, mild illness (non-neuroinvasive disease) is more likely to be under-reported than more severe (neuroinvasive) cases. Thirdly, data are reported using the county of residence of the individual, not necessarily the county or state of exposure, possibly skewing any state and county-level data. Finally, non-human surveillance is variably conducted across the country and the absence of non-human activity data should not be interpreted as no risk. 
+
+Unfortunately, the impact of Hurricane Helene in Asheville, North Carolina, affected our original data sources for climate change indicators. We were unable to access some data we intended to use in our analyses, which resulted in the use of other data sources and analysis techniques. While we find our analyses to be thorough and possess the chance of having a long-term impact on climate change policy and recognition of the impact of climate change on vector-borne diseases, we find it appropriate to mention these limitations. The majority of the strengths in our study lie in their ability to set the standard for future research into these topics. We were able to identify and explore several key indicators as well as establish a basic study design including methodology and an initial hypothesis. 
+
+## Future Research Recommendations
+
+In order to further explore these possible associations in the future, vector and host factors should additionally be included in the analysis as they are impacted by climate change and then WNV incidence is impacted by them. This can include factors such as bird migration. Additionally, it is important to expand research into diagnostics and surveillance, community behaviors, and individual behaviors, as all of these can significantly impact WNV reporting and incidence and were unable to be characterized due to the scope of this study. This research can be used as a starting point for future research as the relationship between the CCI and WNV is more complex than we were able to fully explore. 

@@ -1,0 +1,83 @@
+---
+title: "Supplemental Materials"
+author: "Emma Hardin-Parker & Makenzie Hicks"
+format: pdf
+editor: visual
+---
+
+```{r echo=FALSE}
+#| echo: false
+library(ggplot2)
+library(tidyverse)
+library(car)
+library(knitr)
+library(gt)
+library(stringr)
+library(tidyr)
+library(ggcorrplot)
+library(forecast)
+library(reshape2)
+library(RColorBrewer)
+library(cluster)
+library(rgl)
+```
+
+```{r}
+#| echo: false
+wnv_full <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/West Nile virus human neuroinvasive disease average annual incidence per 100,000 population by county of residence, 1999-2023.csv")
+```
+
+
+# Basic Data Structure and Descriptive Statistics
+
+```{r}
+#| echo: false
+# Calculate summary statistics for Incidence and Population
+incidence_summary <- summary(wnv_full$Incidence)
+population_summary <- summary(wnv_full$Population)
+
+# Standard deviation for Incidence and Population
+incidence_sd <- sd(wnv_full$Incidence, na.rm = TRUE)
+population_sd <- sd(wnv_full$Population, na.rm = TRUE)
+
+# Combining the summary statistics and standard deviations into a data frame
+summary_table <- data.frame(
+  Statistic = c("Min", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max", "Std. Dev."),
+  Incidence = c(incidence_summary[1], incidence_summary[2], incidence_summary[3], 
+                incidence_summary[4], incidence_summary[5], incidence_summary[6], incidence_sd),
+  Population = c(population_summary[1], population_summary[2], population_summary[3], 
+                 population_summary[4], population_summary[5], population_summary[6], population_sd)
+)
+
+#| label: tab-des
+#| fig-cap: "Table 1: Descriptive Statistics for WNV Incidence and Population"
+# Creating Professional Table 
+summary_table %>%
+  gt() %>%
+  tab_header(
+    title = "Descriptive Statistics for WNV Incidence and Population",
+    subtitle = "Summary statistics and standard deviations"
+  ) %>%
+  fmt_number(
+    columns = c(Incidence, Population),
+    decimals = 2
+  ) %>%
+  cols_label(
+    Statistic = "Statistic",
+    Incidence = "Incidence",
+    Population = "Population"
+  ) %>%
+  tab_style(
+    style = list(
+      cell_text(weight = "bold")
+    ),
+    locations = cells_column_labels()
+  ) %>%
+  tab_options(
+    table.width = pct(100),
+    column_labels.font.size = px(14),
+    table.font.size = px(12)
+  )
+
+```
+

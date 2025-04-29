@@ -1,0 +1,1319 @@
+---
+title: "West Nile Virus and Climate Change"
+author: "Emma Hardin-Parker & Makenzie Hicks"
+format: pdf
+editor: visual
+---
+```{r echo=FALSE}
+#| echo: false
+library(ggplot2)
+library(tidyverse)
+library(car)
+library(knitr)
+library(gt)
+library(stringr)
+library(tidyr)
+library(ggcorrplot)
+library(forecast)
+library(reshape2)
+library(RColorBrewer)
+library(cluster)
+library(rgl)
+```
+
+\newpage 
+
+# Abstract
+
+# Introduction 
+
+# Methodology 
+
+## Historic Data
+
+### Data Introduction: 
+
+```{r}
+#| echo: false
+wnv_full <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/West Nile virus human neuroinvasive disease average annual incidence per 100,000 population by county of residence, 1999-2023.csv")
+```
+
+These data were accessed from the [CDC Historic Data Page](https://www.cdc.gov/west-nile-virus/data-maps/historic-data.html) and were downloaded via .csv files. This data shows historic data of WNV incidence by county from 1993-2023. The goal with this data in particular are to identify both high-risk counties and high-risk states to move forward with our climate change indicator analysis. To get started, we calculated some descriptive statistics to become more comfortable with the data. 
+
+### Basic Data Structure and Descriptive Statistics:
+
+```{r}
+#| echo: false
+# Calculate summary statistics for Incidence and Population
+incidence_summary <- summary(wnv_full$Incidence)
+population_summary <- summary(wnv_full$Population)
+
+# Standard deviation for Incidence and Population
+incidence_sd <- sd(wnv_full$Incidence, na.rm = TRUE)
+population_sd <- sd(wnv_full$Population, na.rm = TRUE)
+
+# Combining the summary statistics and standard deviations into a data frame
+summary_table <- data.frame(
+  Statistic = c("Min", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max", "Std. Dev."),
+  Incidence = c(incidence_summary[1], incidence_summary[2], incidence_summary[3], 
+                incidence_summary[4], incidence_summary[5], incidence_summary[6], incidence_sd),
+  Population = c(population_summary[1], population_summary[2], population_summary[3], 
+                 population_summary[4], population_summary[5], population_summary[6], population_sd)
+)
+
+# Creating Professional Table 
+table_1 <- summary_table %>%
+  gt() %>%
+  tab_header(
+    title = "Descriptive Statistics for WNV Incidence and Population",
+    subtitle = "Summary statistics and standard deviations"
+  ) %>%
+  fmt_number(
+    columns = c(Incidence, Population),
+    decimals = 2
+  ) %>%
+  cols_label(
+    Statistic = "Statistic",
+    Incidence = "Incidence",
+    Population = "Population"
+  ) %>%
+  tab_style(
+    style = list(
+      cell_text(weight = "bold")
+    ),
+    locations = cells_column_labels()
+  ) %>%
+  tab_options(
+    table.width = pct(100),
+    column_labels.font.size = px(14),
+    table.font.size = px(12)
+  )
+# Save the table as a PNG file
+gtsave(table_1, "Table1_DescriptiveStatistics.png")
+```
+
+#### Distribution of Incidence Rates: 
+
+```{r}
+#| echo: false
+# Histogram of incidence rates
+dist_inc_all <- ggplot(wnv_full, aes(x = Incidence)) +
+  geom_histogram(binwidth = 0.5, fill = "steelblue", color = "black") +  
+  labs(title = "Distribution of WNV Incidence Rates", 
+       x = "Incidence Rate per 100,000", 
+       y = "Frequency") +  # Add descriptive axis labels
+  theme_minimal() +  # Clean theme for a professional look
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  
+    axis.title = element_text(size = 12, face = "bold"),  
+    axis.text = element_text(size = 10)  
+  )
+
+# Save the specific plot
+ggsave("Distribution_Incidence_Rates.png", plot = dist_inc_all, width = 8, height = 6, dpi = 300)
+```
+
+Now that we have a general idea of the distribution of incidence rates from 1993-2023, we are going to move forward with both State and County summaries with accompanying figures. 
+
+
+### State and County Distribution Summaries:
+
+```{r}
+#| echo: false
+# Summarize average incidence rate by state
+state_summary <- wnv_full %>%
+  group_by(State = substr(FullGeoName, 1, 2)) %>%
+  summarize(mean_incidence = mean(Incidence, na.rm = TRUE),
+            total_population = sum(Population))
+
+# Create a professional table using gt
+table_2 <- state_summary %>%
+  gt() %>%
+  tab_header(title = "Average WNV Incidence and Population by State",
+    subtitle = "Summary of West Nile Virus incidence rates across U.S. states"
+  ) %>%
+  fmt_number(
+    columns = c(mean_incidence, total_population),  # Format the numerical columns
+    decimals = 2
+  ) %>%
+  cols_label(
+    State = "State",
+    mean_incidence = "Mean Incidence Rate",
+    total_population = "Total Population"
+  ) %>%
+  tab_style(
+    style = list(
+      cell_text(weight = "bold")
+    ),
+    locations = cells_column_labels()
+  ) 
+
+# Save the table as a PNG file
+gtsave(table_2, "Table2_StateStatistics.png")
+```
+
+
+
+#### Identifying High-Risk States:
+```{r}
+#| echo: false
+high_risk_states <- state_summary %>%
+  filter(mean_incidence > 1) %>%
+  arrange(desc(mean_incidence))
+
+high_risk_states %>%
+  gt() %>%
+  tab_header(
+    title = "High Risk States: WNV Incidence",
+    subtitle = "Summary of High Risk States (Incidence > 1)"
+  ) %>%
+  fmt_number(
+    columns = c(mean_incidence),  
+    decimals = 4
+  ) %>%
+  cols_label(
+    State = "State",
+    mean_incidence = "Mean Incidence"
+  ) %>%
+  tab_style(
+    style = list(
+      cell_text(weight = "bold")
+    ),
+    locations = cells_column_labels()
+  ) %>%
+  tab_caption("Table 1: Mean Incidence of High-Risk States") %>% 
+  tab_options(
+    table.width = pct(100),  # Make table full-width
+    column_labels.font.size = px(14),  # Increase column label font size
+    table.font.size = px(12)  # Set font size for the table content
+  )
+
+```
+After viewing the overall state summaries, we determined that our threshold for *high-risk* states were to be an Average Incidence greater than 1. After filtering out these *high-risk* states, we are left with 12 states to move forward with analysis. Additionally, we intend to conduct both state level and county level analyses; therefore we have elected to go through the *high-risk* process again with county-level data, with a threshold of Incidence > 5. 
+
+
+#### Identifying High-Risk Counties: 
+
+```{r}
+#| echo: false
+# Filter counties with high incidence rates (e.g., incidence rate > 5)
+high_risk_counties <- wnv_full %>%
+  filter(Incidence > 5) %>%
+  arrange(desc(Incidence)) %>%
+  select(-Legend, -County)
+
+
+# Condensed table with fewer columns and smaller size
+high_counties_table <- high_risk_counties %>%
+  select(-Type, -Year, -Population, -Average_Temperature, -Average_Precipitation, -Drought_Severity) %>%
+  arrange(desc(Incidence)) %>%
+  gt() %>%
+  tab_header(
+    title = "High Risk Counties of WNV Incidence",
+    subtitle = "Summary of High Risk Counties (Incidence > 5)"
+  ) %>%
+  fmt_number(
+    columns = Incidence,  # Format only the Incidence column
+    decimals = 4
+  ) %>%
+  cols_label(
+    FullGeoName = "County",
+    Incidence = "Incidence"
+  ) %>%
+  tab_style(
+    style = list(
+      cell_text(weight = "bold")
+    ),
+    locations = cells_column_labels()
+  ) %>%
+  tab_options(
+    table.width = pct(80),  # Adjust the table width
+    column_labels.font.size = px(14),  # Increase column label font size
+    table.font.size = px(10),  # Smaller font size for the table content
+    data_row.padding = px(3)  # Reduce row padding to make table more compact
+  )
+gtsave(high_counties_table, "high_risk_counties_table.png")
+
+
+# Histogram of incidence rates
+highriskhist <- ggplot(high_risk_counties, aes(x = Incidence)) +
+  geom_histogram(binwidth = 0.5, fill = "steelblue", color = "black") +  
+  labs(title = "Distribution of WNV Incidence Rates: High-Risk Counties", 
+       x = "Incidence Rate per 100,000", 
+       y = "Frequency") +  # Add descriptive axis labels
+  theme_minimal() +  # Clean theme for a professional look
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  
+    axis.title = element_text(size = 12, face = "bold"),  
+    axis.text = element_text(size = 10)  
+  )
+```
+
+After filtering out counties with an Incidence > 5, we are left with 114 counties for further analysis. We plan to cross-reference climate change indicator data (precipitation, temperature, and drought) to determine relationships and significant effects of these indicators on incidence rates in these areas. 
+
+### Further Analysis
+
+#### Years of Illness Onset 
+
+We also accessed CDC data on the month of illness onset from 1999-2023. We intend to use this data to guide our climate change indicator analysis. 
+```{r}
+#| echo: false
+years_illness_onset <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/years_illness_onset.csv")
+
+# Reorder the Month column as a factor with levels in calendar order
+years_illness_onset$Month <- factor(years_illness_onset$Month, 
+                                    levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                                               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+
+# Create a bar plot and add the numbers on top of each bar
+ggplot(years_illness_onset, aes(x = Month, y = Reported.Cases, fill = Month)) +
+  geom_bar(stat = "identity", color = "black") +  # Create a bar plot with black borders
+  geom_text(aes(label = Reported.Cases), vjust = -0.5, size = 4) +  # Add the case numbers on top of the bars
+  labs(title = "WNV Illness Onset by Month (1999-2023)", 
+       x = "Month of Illness Onset", 
+       y = "Reported Cases") +  # Add meaningful labels
+  theme_minimal() +  # Apply a minimal, clean theme
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),  # Center and bold the title
+    axis.title = element_text(size = 12, face = "bold"),  # Bold axis titles
+    axis.text = element_text(size = 10),  # Increase axis text size
+    legend.position = "none"  # Remove the legend
+  ) +
+  scale_fill_brewer(palette = "BrBG")  # Use a color palette for better aesthetics
+```
+From the above bar chart we can see that August has the most reported cases of months of illness onset. Given this, we intend to focus on July and August for our climate change indicator levels for precipitation, drought, and temperature. 
+
+#### High-Risk Counties Manipulation: 
+
+```{r}
+high_risk_counties$Average_Temperature <- c(81.3,69.3,80.0, 68.5, 70.2, 67.8, 69.3, 65.8, 67.5, 68.1, 68.2, 70.0, 67.9, 70.0, 67.3, 64.4, 67.9, 65.5, 66.1, 69.8, 72.2, 65.4, 77.9, 69.4, 73.3, 71.3, 77.5, 70.6, 66.6, 71.2, 69.8, 75.8, 73.4, 70.3, 69.8, 71.2, 67.7, 69.4, 66.5, 70.4, 71.9, 70.9, 66.3, 71.8, 77.0, 71.2, 72.0, 63.5, 67.3, 66.9, 69.0, 68.8, 67.5, 68.9, 64.8, 80.1, 79.7, 70.4, 71.9, 78.1, 66.8, 70.8, 66.5, 64.6, 64.4, 68.8, 69.9, 77.2, 68.8, 67.7, 69.9, 72.5, 71.1, 70.6, 72.0, 65.3, 64.9, 81.7, 67.3, 67.8, 72.0, 72.8, 70.9, 66.9, 68.9, 67.4, 66.7, 69.9, 66.1, 76.1, 72.8, 71.2, 71.8, 65.7, 70.2, 70.2, 73.0, 67.6, 77.4, 67.0, 65.3, 76.8, 70.5, 68.0, 76.1, 67.7, 71.4, 71.1, 66.4, 71.0, 66.6, 71.3, 65.9, 75.3)
+
+high_risk_counties$Average_Precipitation <- 
+  c(6.94, 6.22, 5.93, 5.13, 8.39, 3.62, 7.51, 6.19, 4.10, 6.98, 4.18, 7.74, 7.37, 7.65, 5.11, 4.70, 6.99, 7.55, 5.36, 8.56, 6.45, 4.22, 7.29, 6.47, 8.67, 6.27, 7.09, 8.45, 6.61, 6.40, 6.35, 7.07, 8.02, 7.27, 6.59, 8.76, 8.36, 4.59, 8.84, 7.89, 5.78, 8.41, 9.23, 7.02, 7.25, 8.03, 5.95, 3.74, 8.66, 1.41, 7.85, 9.61, 8.99, 7.81, 6.50, 7.21, 8.88, 8.89, 7.06, 4.83, 9.46, 7.44, 3.89, 7.76, 7.82, 5.76, 7.07, 7.30, 7.91, 5.09, 9.20, 5.62, 5.23, 9.19, 7.35, 8.02, 7.17, 4.39, 4.89, 9.21, 6.27, 8.13, 9.39, 6.20, 7.19, 8.74, 8.68, 8.01, 6.78, 5.09, 6.26, 9.56, 7.99, 8.11, 8.84, 8.28, 6.76, 7.50, 6.49, 6.11, 7.44, 5.46, 9.12, 6.67, 1.26, 8.49, 5.43, 5.28, 8.91, 6.22, 6.00, 5.99, 6.47, 7.40)
+
+high_risk_counties$Drought_Severity <- c(-0.37, 1.58, -0.55, -0.21, 2.93, 1.18, 1.49, 0.89, 0.72, 2.26, -1.05, 1.43, 2.36, 2.51, 0.37, 0.35, 1.74, 2.80, -0.03, 2.41, -0.12, 0.66, 0.14, 2.43, 1.77, 0.35, -1.06, 1.94, 1.38, 2.16, 0.36, -0.33, -0.30, 1.13, 0.97, 1.80, 1.50, 2.34, -1.64, 1.84, 0.86, -1.24, 2.50, 1.31, 0.04, 2.55,  0.29, 0.44, -1.40, 2.79, -0.95, 2.62, 2.06, 2.26, 1.29, -0.57, 0.53, 0.64, 1.35, -0.31, 0.98, 1.04, 2.40, -0.12, 1.58, 1.76, 0.91, 0.17, 1.83,  2.09, 0.83, 0.17, 1.70, 0.46, 1.48, 2.76, 2.25, -0.41, -2.67, -0.78, 0.71, -0.63, 1.71, 1.48, 0.58, 2.04, 2.22, 2.53, 2.15, -1.30, -0.88, 0.50, 1.05, 1.84, 1.34, 1.98, 1.60, 2.06, 0.14, 1.42, 0.64, 0.55, 1.73, 1.89, -1.01, -1.75, 1.73, -1.55, -0.93, 1.54, 0.73, -0.89, 0.52, -0.33)
+```
+
+### Statistical Analysis High Risk Counties
+
+#### Descriptive Statistics
+
+```{r}
+
+```
+
+#### Correlation Analysis 
+
+```{r}
+# Correlation matrix
+cor_matrix <- high_risk_counties %>%
+  select(Incidence, Average_Temperature, Average_Precipitation, Drought_Severity) %>%
+  cor()
+
+cor_matrix
+
+# Select relevant columns for correlation analysis
+cor_data <- high_risk_counties %>%
+  select(Incidence, Average_Temperature, Average_Precipitation, Drought_Severity)
+
+# Recalculate correlation matrix after ensuring no missing values or incorrect types
+cor_matrix <- cor(cor_data, use = "pairwise.complete.obs")
+
+# Melt the correlation matrix to long format for ggplot
+melted_cor_matrix <- melt(cor_matrix)
+
+# Rename the variables to remove underscores
+melted_cor_matrix$Var1 <- gsub("_", " ", melted_cor_matrix$Var1)
+melted_cor_matrix$Var2 <- gsub("_", " ", melted_cor_matrix$Var2)
+
+# Create the heatmap using ggplot2
+ggplot(data = melted_cor_matrix, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "red", high = "blue", mid = "white", 
+                       midpoint = 0, limit = c(-1, 1), space = "Lab", 
+                       name = "Correlation") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  coord_fixed() +
+  geom_text(aes(label = round(value, 2)), color = "black", size = 4) +
+  labs(title = "Correlation Heatmap CCIs and WNV Incidence", x = "", y = "")
+
+
+```
+#### Trend Analysis 
+
+```{r}
+library(ggplot2)
+
+# Scatter plot of Incidence vs. Average Temperature
+ggplot(high_risk_counties, aes(x = Average_Temperature, y = Incidence)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  labs(title = "WNV Incidence vs Average Temperature", x = "Average Temperature", y = "WNV Incidence")
+
+# Scatter plot of Incidence vs. Drought Severity
+ggplot(high_risk_counties, aes(x = Drought_Severity, y = Incidence)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "WNV Incidence vs Drought Severity", x = "Drought Severity", y = "WNV Incidence")
+
+```
+#### Linear Regression
+
+```{r}
+# Fit a multiple regression model
+multi_mod <- lm(Incidence ~ Average_Temperature + Average_Precipitation + Drought_Severity, data = high_risk_counties)
+
+# Summary of the model
+summary(multi_mod)
+
+temp_mod <- lm(Incidence ~ Average_Temperature, data = high_risk_counties)
+summary(temp_mod)
+
+precip_mod <- lm(Incidence ~ Average_Precipitation, data = high_risk_counties)
+summary(precip_mod)
+
+drought_mod <- lm(Incidence ~ Drought_Severity, data = high_risk_counties)
+summary(drought_mod)
+```
+#### Clustering Analysis 
+
+```{r}
+# Scaling the data before clustering
+scaled_data <- scale(high_risk_counties %>% select(Incidence, Average_Temperature, Average_Precipitation, Drought_Severity))
+
+# Perform k-means clustering with 3 clusters
+set.seed(123)
+kmeans_result <- kmeans(scaled_data, centers = 3, nstart = 25)
+
+# Add cluster assignment to the original data
+high_risk_counties$cluster <- as.factor(kmeans_result$cluster)
+
+
+# Improved plot for Incidence vs. Temperature with clustering
+ggplot(high_risk_counties, aes(x = Average_Temperature, y = Incidence, color = factor(cluster))) +
+  geom_point(size = 3, alpha = 0.7) +  # Larger points with some transparency
+  scale_color_manual(values = c("red", "green", "blue")) +  # Custom colors for clusters
+  labs(
+    title = "Clustering of Counties Based on WNV Incidence and Temperature",
+    x = "Average Temperature (°F)",  # Add units to labels
+    y = "WNV Incidence",
+    color = "Cluster"  # Cleaner legend title
+  ) +
+  theme_minimal() +  # Clean theme
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),  # Center title
+    axis.text = element_text(size = 12),  # Bigger axis labels
+    axis.title = element_text(size = 14),  # Bigger axis titles
+    legend.position = "right"  # Position the legend
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 4)))  # Larger legend points
+
+# Plot for Precipitation
+ggplot(high_risk_counties, aes(x = Average_Precipitation, y = Incidence, color = factor(cluster))) +
+  geom_point(size = 3, alpha = 0.7) +
+  scale_color_manual(values = c("red", "green", "blue")) +
+  labs(
+    title = "Clustering of Counties Based on WNV Incidence and Precipitation",
+    x = "Average Precipitation (inches)",
+    y = "WNV Incidence",
+    color = "Cluster"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.position = "right"
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 4)))
+
+# Plot for Drought Severity
+ggplot(high_risk_counties, aes(x = Drought_Severity, y = Incidence, color = factor(cluster))) +
+  geom_point(size = 3, alpha = 0.7) +
+  scale_color_manual(values = c("red", "green", "blue")) +
+  labs(
+    title = "Clustering of Counties Based on WNV Incidence and Drought Severity",
+    x = "Drought Severity",
+    y = "WNV Incidence",
+    color = "Cluster"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 13, face = "bold"),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.position = "right"
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 4)))
+
+
+```
+### Clustering pt. 2 
+
+```{r}
+# Load libraries
+library(ggplot2)
+library(ggthemes)
+
+# Set color palette for clusters
+color_palette <- c("#E41A1C", "#377EB8", "#4DAF4A")  # Red, Blue, Green for clusters (colorblind-friendly)
+
+# Improved plot for Incidence vs. Temperature with clustering
+ggplot(high_risk_counties, aes(x = Average_Temperature, y = Incidence, color = factor(cluster))) +
+  geom_point(size = 3.5, alpha = 0.75) +  # Slightly larger points, with transparency
+  scale_color_manual(values = color_palette) +  # Apply custom colors
+  labs(
+    title = "Clustering of Counties Based on WNV Incidence and Temperature",
+    x = "Average Temperature (°F)", 
+    y = "WNV Incidence",
+    color = "Cluster"
+  ) +
+  theme_minimal(base_size = 15) +  # Cleaner base theme and increased font size for better readability
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 13, face = "bold"),  # Centered and bold title
+    axis.text = element_text(size = 14),  # Larger axis text
+    axis.title = element_text(size = 16),  # Larger axis title text
+    legend.position = "right",  # Keep the legend on the right
+    panel.grid.minor = element_blank()  # Remove minor grid lines for a cleaner look
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 5)))  # Larger legend points
+
+# Plot for Precipitation vs. Incidence
+ggplot(high_risk_counties, aes(x = Average_Precipitation, y = Incidence, color = factor(cluster))) +
+  geom_point(size = 3.5, alpha = 0.75) +  # Same styling as above
+  scale_color_manual(values = color_palette) +
+  labs(
+    title = "Clustering of Counties Based on WNV Incidence and Precipitation",
+    x = "Average Precipitation (inches)",
+    y = "WNV Incidence",
+    color = "Cluster"
+  ) +
+  theme_minimal(base_size = 15) +  
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 13, face = "bold"), 
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    legend.position = "right",
+    panel.grid.minor = element_blank()
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 5)))
+
+# Plot for Drought Severity vs. Incidence
+ggplot(high_risk_counties, aes(x = Drought_Severity, y = Incidence, color = factor(cluster))) +
+  geom_point(size = 3.5, alpha = 0.75) +
+  scale_color_manual(values = color_palette) +
+  labs(
+    title = "Clustering of Counties Based on WNV Incidence and Drought Severity",
+    x = "Drought Severity",
+    y = "WNV Incidence",
+    color = "Cluster"
+  ) +
+  theme_minimal(base_size = 15) +  
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 13, face = "bold"), 
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    legend.position = "right",
+    panel.grid.minor = element_blank()
+  ) +
+  guides(color = guide_legend(override.aes = list(size = 5)))
+
+```
+
+
+## Reported Cases by Year:
+
+These data were individually downloaded from the [CDC Historic Data](https://www.cdc.gov/west-nile-virus/data-maps/historic-data.html). Each individual data set contained information on the number of cases reported, their activity type, case type, and corresponding county. Activity type here is defined by the following: **Non-human activity**: indicates that veterinary disease cases or infections in mosquitoes, birds, or sentinel animals have been reported to the CDC, **Human infections**: indicates that human disease cases or infections in blood donors have been reported to the CDC, and **Human infections and non-human activity**: indicates that both human infections and non-human infections have been reported to the CDC. These data sets were individually aggregated and written into a .csv file for future use. 
+
+```{r}
+#| echo: false
+getwd()
+
+file_path <- "/Users/ehardinparker/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/yearly"
+
+
+# List all files that match the pattern for yearly cases (e.g., '2000cases.csv', '2001cases.csv', etc.)
+file_list <- list.files(path = file_path, pattern = "\\d{4}cases.csv", full.names = TRUE)
+
+# Read and merge all files into a single dataframe and rename the dataset to 'yearly_wnv'
+yearly_wnv <- do.call(rbind, lapply(file_list, read.csv))
+
+# View the combined dataset
+head(yearly_wnv)
+
+# Save the combined dataset if needed
+write.csv(yearly_wnv, "yearly_wnv_combined.csv", row.names = FALSE)
+
+yearly_wnv_combined <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/yearly_wnv_combined.csv")
+```
+
+### Descriptive Statistics: 
+
+```{r}
+#| echo: false
+# Create a grouped summary by Activity 
+case_summary <- yearly_wnv %>%
+  group_by(Activity) %>%
+  summarize(Count = n())
+
+# Calculate the percentage of each case type
+case_summary <- case_summary %>%
+  mutate(Percentage = round(Count / sum(Count) * 100, 1))  
+
+# Create the pie chart
+ggplot(case_summary, aes(x = "", y = Count, fill = Activity)) +
+  geom_bar(stat = "identity", width = 1, color = "white") +  
+  coord_polar(theta = "y") +  
+  geom_text(aes(label = paste0(Percentage, "%")), 
+            position = position_stack(vjust = 0.5), size = 5, color = "white") + 
+  scale_fill_brewer(palette = "Dark2") + 
+  labs(title = "Distribution of Case Reports by Type") + 
+  theme_void() + 
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  
+    legend.title = element_blank(),  
+    legend.text = element_text(size = 12) 
+  )
+
+
+# Reported cases over time 
+ggplot(yearly_wnv_combined, aes(x = Year, y = Reported.human.cases)) +
+  geom_line(color = "darkred", size = 1) +  
+  geom_point(color = "darkred", size = 2) + 
+  labs(title = "Reported WNV Cases Over Time", 
+       x = "Year", 
+       y = "Reported Human Cases") + 
+  theme_minimal() +  
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  
+    axis.title = element_text(size = 12, face = "bold"),  
+    axis.text = element_text(size = 10)  
+  ) +
+  scale_x_continuous(breaks = seq(min(yearly_wnv_combined$Year), max(yearly_wnv_combined$Year), by = 2)) +  
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05)))  
+
+
+# Create a line plot with better formatting and separation by Activity
+ggplot(yearly_wnv_combined, aes(x = Year, y = Reported.human.cases, color = Activity, group = Activity)) +
+  geom_line(size = 1) +  # Create a line for each Activity type
+  geom_point(size = 2, alpha = 0.7) +  # Add points with transparency for better readability
+  labs(title = "Reported WNV Cases Over Time by Activity Type", 
+       x = "Year", 
+       y = "Reported Human Cases") +  # Add meaningful labels
+  theme_minimal() +  # Apply a minimal, clean theme
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),  # Center and bold the title, increase size
+    axis.title = element_text(size = 12, face = "bold"),  # Make axis titles bold
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10),  # Rotate and adjust x-axis labels for readability
+    axis.text.y = element_text(size = 10),  # Increase y-axis text size
+    legend.title = element_blank(),  # Remove the legend title
+    legend.position = "right",  # Keep the legend on the right
+    legend.text = element_text(size = 12)  # Increase the size of legend text
+  ) +
+  scale_x_continuous(breaks = seq(min(yearly_wnv_combined$Year), max(yearly_wnv_combined$Year), by = 2)) +  # Adjust x-axis breaks
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +  # Add space above the max value
+  scale_color_manual(values = c("darkred", "steelblue", "darkgreen"),  # Customize colors for each Activity type
+                     labels = c("Human Infections", "Human & Non-human Activity", "Non-human Activity"))  # Simplified legend labels
+
+
+```
+
+From the above pie chart we can see that nearly half of all case reports were from non-human activity, with a combination of human infections and non-human activity following at 29.2%.  
+
+
+### Distributions by Year
+```{r}
+# Reshape the data to long format for plotting multiple lines
+yearly_long <- yearly_summary %>%
+  pivot_longer(cols = starts_with("total"), names_to = "Case_Type", values_to = "Count")
+
+  
+# Combined line plot for all case types with professional styling
+ggplot(yearly_long, aes(x = Year, y = Count, color = Case_Type, linetype = Case_Type, group = Case_Type)) +
+  geom_line(size = 1.2) +
+  labs(title = "Trends in WNV Reported Cases, Neuroinvasive Disease, \nand Blood Donor Screening Over Time",
+       x = "Year", y = "Total Cases") +
+  scale_color_brewer(palette = "Dark2") +  # Use a professional-looking color palette
+  scale_linetype_manual(values = c("solid", "solid", "solid")) +  # Different line styles
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),  # Center and bold title
+    axis.title.x = element_text(size = 14),  # Increase x-axis label size
+    axis.title.y = element_text(size = 14),  # Increase y-axis label size
+    axis.text = element_text(size = 12),  # Increase axis text size
+    legend.title = element_text(size = 8),  # Adjust legend title size
+    legend.position = "top",  # Move legend to the top
+    legend.text = element_text(size = 8),  # Increase legend text size
+    panel.grid.minor = element_blank(),  # Remove minor gridlines for cleaner look
+    panel.grid.major = element_line(size = 0.5, color = "gray80")  # Subdue major gridlines
+  )
+```
+
+### Year 
+
+```{r}
+# Summarize the number of each activity type per year
+activity_summary <- yearly_wnv %>%
+  group_by(Year, Activity) %>%
+  summarize(count = n()) %>%
+  ungroup()
+
+
+
+
+# Plot to compare activity types with professional styling
+ggplot(activity_summary, aes(x = Year, y = count, fill = Activity)) +
+  geom_bar(stat = "identity", position = "dodge", color = "black") +  # Add black borders to bars
+  labs(title = "WNV Human Infections vs. Non-Human Activity Over Time",
+       x = "Year", y = "Cases by Activity") +
+  scale_fill_brewer(palette = "Set2") +  # Apply a professional color palette
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),  # Center and bold the title
+    axis.title.x = element_text(size = 14),  # Increase font size for x-axis title
+    axis.title.y = element_text(size = 14),  # Increase font size for y-axis title
+    axis.text = element_text(size = 12),  # Increase axis text size
+    legend.title = element_text(size = 8),  # Increase legend title size
+    legend.position = "top",  # Move the legend to the top
+    legend.text = element_text(size = 8),  # Increase legend text size
+    panel.grid.major = element_line(color = "gray80", size = 0.5),  # Subtle major gridlines
+    panel.grid.minor = element_blank()  # Remove minor gridlines
+  )
+
+```
+## Merge pt. 2
+
+```{r}
+# Calculate the average case types (reported cases, neuroinvasive, blood donor) by county
+yearly_wnv_averages <- yearly_wnv %>%
+  group_by(FullGeoName) %>%
+  summarize(
+    avg_reported_cases = mean(Reported.human.cases, na.rm = TRUE),
+    avg_neuroinvasive_cases = mean(Neuroinvasive.disease.cases, na.rm = TRUE),
+    avg_blood_donor_cases = mean(Identified.by.Blood.Donor.Screening, na.rm = TRUE)
+  ) %>%
+  mutate(avg_total_case = avg_reported_cases + avg_neuroinvasive_cases + avg_blood_donor_cases)
+
+
+# Merge the averages with the high-risk counties dataset (without Year)
+combined_data <- merge(high_risk_counties, yearly_wnv_averages, by = "FullGeoName")
+```
+
+## K-means Clustering
+
+```{r}
+# Prepare data for clustering
+clustering_data <- combined_data %>%
+  select(Average_Temperature, Average_Precipitation, Drought_Severity, avg_total_case) %>%
+  na.omit()
+
+# Apply K-Means clustering (set k = 3 clusters as an example)
+set.seed(123)
+kmeans_result <- kmeans(clustering_data, centers = 3)
+
+# Add cluster assignment to the data
+combined_data$cluster_kmeans <- kmeans_result$cluster
+
+# View the clustering result
+table(combined_data$cluster_kmeans)
+
+# Example of visualizing the clusters
+library(ggplot2)
+
+ggplot(combined_data, aes(x = Average_Temperature, y = avg_total_case, color = factor(cluster_kmeans))) +
+  geom_point(size = 3) +
+  labs(title = "K-Means Clustering of Average Temperature and Total Cases",
+       x = "Average Temperature", y = "Average Total Cases",
+       color = "Cluster") +
+  theme_minimal()
+
+# Select the three indicators for clustering
+data_for_clustering <- combined_data %>%
+  select(Average_Temperature, Average_Precipitation, Drought_Severity) %>%
+  na.omit()
+
+# Standardize the data
+scaled_data <- scale(data_for_clustering)
+
+# Perform K-means clustering (choose 3 clusters for example)
+set.seed(123)  # Set seed for reproducibility
+kmeans_result <- kmeans(scaled_data, centers = 3, nstart = 25)
+
+# Add the cluster information back to the original data
+combined_data$cluster <- as.factor(kmeans_result$cluster)
+
+# 3D Scatter plot using plot3d (from rgl package)
+plot3d(combined_data$Average_Temperature, 
+       combined_data$Average_Precipitation, 
+       combined_data$Drought_Severity, 
+       col = combined_data$cluster, 
+       xlab = "Average Temperature", 
+       ylab = "Average Precipitation", 
+       zlab = "Drought Severity", 
+       size = 5, 
+       type = "s", 
+       main = "3D K-Means Clustering")
+
+library(ggthemes)
+install.packages("ggthemes")
+
+# Create a cleaner and more readable plot
+ggplot(combined_data, aes(x = Average_Temperature, y = Average_Precipitation, color = cluster, shape = cluster)) +
+  geom_point(size = 4, alpha = 0.7) +  # Increase point size and transparency
+  labs(title = "K-Means Clustering on Temperature, Precipitation, and Drought Severity", 
+       x = "Average Temperature (°F)", 
+       y = "Average Precipitation (inches)") +
+  scale_color_manual(values = c("red", "green", "blue")) +  # Clearer color differentiation
+  scale_shape_manual(values = c(16, 17, 15)) +  # Use more distinct shapes
+  theme_minimal(base_size = 15) +  # Larger base font size for readability
+  theme(legend.position = "right",  # Adjust legend position
+        axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels if needed
+        plot.title = element_text(hjust = 0.5, face = "bold", size = 18),  # Center and bold title
+        axis.title = element_text(face = "bold"))  # Bold axis titles
+
+```
+
+
+## PCA
+
+```{r}
+
+# PCA on selected variables
+pca_data <- combined_data %>%
+  select(Average_Temperature, Average_Precipitation, Drought_Severity, avg_total_case) %>%
+  na.omit()
+
+# Standardize the data
+pca_data_scaled <- scale(pca_data)
+
+# Perform PCA
+pca_result <- prcomp(pca_data_scaled, center = TRUE, scale. = TRUE)
+
+# View the summary of PCA result
+summary(pca_result)
+
+# Plot the PCA
+plot(pca_result, type = "l")
+
+# Load necessary library
+library(ggplot2)
+
+# Perform PCA
+pca_result <- prcomp(pca_data_scaled, center = TRUE, scale. = TRUE)
+
+# Extract the explained variance for each principal component
+explained_variance <- pca_result$sdev^2 / sum(pca_result$sdev^2) * 100
+
+# Create a data frame for the plot
+pca_df <- data.frame(PC = 1:length(explained_variance), Variance = explained_variance)
+
+# Enhanced scree plot using ggplot2
+ggplot(pca_df, aes(x = PC, y = Variance)) +
+  geom_point(size = 4) +
+  geom_line() +
+  labs(title = "Scree Plot: Variance Explained by Principal Components",
+       x = "Principal Component",
+       y = "Variance Explained (%)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10)
+  )
+
+# View the loadings (contribution of each variable to each PC)
+pca_result$rotation
+
+summary(pca_result)
+
+```
+
+
+
+### Correlation
+
+```{r}
+# Scatter plot comparing average reported human cases and average temperature
+ggplot(combined_data, aes(x = Average_Temperature, y = avg_total_case)) +
+  geom_point(color = "blue", size = 3, alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Average Reported Human Cases vs. Average Temperature",
+       x = "Average Temperature (°F)",
+       y = "Average Reported Human Cases") +
+  theme_minimal()
+
+# Calculate correlation between case types and environmental factors
+cor_matrix <- combined_data %>%
+  select(avg_reported_cases, avg_neuroinvasive_cases, avg_blood_donor_cases, avg_total_case,
+         Average_Temperature, Average_Precipitation, Drought_Severity) %>%
+  cor(use = "complete.obs")
+
+# Print the correlation matrix
+print(cor_matrix)
+
+
+
+# Select relevant columns for correlation analysis
+cor_data <- combined_data %>%
+  select(avg_reported_cases, avg_neuroinvasive_cases, avg_blood_donor_cases, avg_total_case,
+         Average_Temperature, Average_Precipitation, Drought_Severity)
+
+# Calculate the correlation matrix
+cor_matrix <- cor(cor_data, use = "complete.obs")
+
+
+# Create a professional-looking correlation heatmap with squares
+ggcorrplot(cor_matrix, 
+           method = "square",    # Use squares instead of circles
+           type = "lower",       # Show only the lower half of the correlation matrix
+           lab = TRUE,           # Display the correlation coefficients
+           lab_size = 4,         # Set label size
+           colors = c("#6D9EC1", "white", "#E46726"),  # Color palette for positive/negative correlations
+           outline.color = "gray",  # Add outline color to the squares
+           title = "Correlation Between WNV Case Types and Environmental Variables"
+) + 
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 11, face = "bold"),  # Center and bold the title
+    axis.title.x = element_blank(),     # Remove the x-axis title
+    axis.title.y = element_blank(),     # Remove the y-axis title
+    axis.text.x = element_text(size = 12, angle = 45, vjust = 1, hjust = 1),  # Rotate x-axis labels for better readability
+    axis.text.y = element_text(size = 12)  # Adjust y-axis text size for better readability
+  )
+
+
+# Compute correlation matrix for select numeric variables
+cor_matrix <- combined_data %>%
+  select(Average_Temperature, Average_Precipitation, Drought_Severity, avg_total_case) %>%
+  cor()
+
+# Plot the correlation matrix
+library(ggcorrplot)
+ggcorrplot(cor_matrix, method = "square", lab = TRUE, lab_size = 3, title = "Correlation Matrix")
+
+```
+### ANOVA
+
+```{r}
+# Run ANOVA
+aov_result <- aov(Incidence ~ factor(cluster), data = combined_data)
+
+# Get summary of ANOVA
+anova_summary <- summary(aov_result)
+
+# Extract ANOVA table values
+anova_table <- data.frame(
+  Term = c("factor(cluster)", "Residuals"),
+  Df = c(anova_summary[[1]]$Df[1], anova_summary[[1]]$Df[2]),
+  `Sum_Sq` = c(anova_summary[[1]]$`Sum Sq`[1], anova_summary[[1]]$`Sum Sq`[2]),
+  `Mean_Sq` = c(anova_summary[[1]]$`Mean Sq`[1], anova_summary[[1]]$`Mean Sq`[2]),
+  `F_value` = c(anova_summary[[1]]$`F value`[1], "-"),
+  `Pr_F` = c(anova_summary[[1]]$`Pr(>F)`[1], "-")
+)
+
+# Load gt package for formatting
+library(gt)
+
+# Using the gt package to create a professional table
+anova_table %>%
+  gt() %>%
+  tab_header(
+    title = "ANOVA Results for WNV Incidence Across Clusters"
+  ) %>%
+  cols_label(
+    Term = "Term",
+    Df = "Degrees of Freedom",
+    Sum_Sq = "Sum of Squares",
+    Mean_Sq = "Mean Squares",
+    F_value = "F Value",
+    Pr_F = "p-value"
+  ) %>%
+  fmt_number(
+    columns = c(Df, Sum_Sq, Mean_Sq, F_value, Pr_F),
+    decimals = 3
+  ) %>%
+  tab_options(
+    table.font.size = 12,
+    heading.align = "center"
+  )
+
+```
+
+
+
+### Linear Regressions
+
+```{r}
+lm2 <- lm(avg_total_case ~ Average_Temperature + Average_Precipitation + Drought_Severity, data = combined_data)
+summary(lm2)
+
+# Load the gt package
+library(gt)
+
+# Create a data frame with regression results
+regression_table <- data.frame(
+  Term = c("(Intercept)", "Average_Temperature", "Average_Precipitation", "Drought_Severity"),
+  Estimate = c(13.27854, -0.14880, -0.01331, -0.34500),
+  Std_Error = c(3.62456, 0.04983, 0.11419, 0.16187),
+  t_value = c(3.663, -2.986, -0.117, -2.131),
+  p_value = c(0.000384, 0.003480, 0.907423, 0.035287)
+)
+
+# Format the table using gt
+regression_table %>%
+  gt() %>%
+  tab_header(
+    title = "Regression Output: Predicting Avgerage Total WNV Cases",
+    subtitle = "Using Temperature, Precipitation, and Drought Severity"
+  ) %>%
+  fmt_number(
+    columns = vars(Estimate, Std_Error, t_value, p_value),
+    decimals = 4
+  ) %>%
+  cols_label(
+    Term = "Predictor",
+    Estimate = "Coefficient Estimate",
+    Std_Error = "Standard Error",
+    t_value = "t-value",
+    p_value = "p-value"
+  ) %>%
+  tab_source_note(
+    source_note = "Significance codes: 0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1"
+  )
+
+
+# Perform ANOVA to test for differences in Incidence across clusters
+anova_model <- aov(Incidence ~ factor(cluster), data = combined_data)
+
+# Summary of the ANOVA
+summary(anova_model)
+
+
+temp_mod <- lm(avg_total_case ~ Average_Temperature, data = combined_data)
+summary(temp_mod)
+```
+### Regression pt 2
+
+```{r}
+lm1 <- lm(Incidence ~ Average_Temperature, data = combined_data)
+summary(lm1)
+
+lm2 <- lm(Incidence ~ Average_Precipitation, data = combined_data)
+summary(lm2)
+
+lm3 <- lm(Incidence ~ Drought_Severity, data = combined_data)
+summary(lm3)
+
+lm4 <- lm(Incidence ~ Average_Temperature + Average_Precipitation + Drought_Severity, data = combined_data  )
+summary(lm4)
+
+library(gt)
+library(broom)
+
+# Function to convert model summaries into gt tables
+create_model_table <- function(model, title) {
+  # Get the summary of the model using broom::tidy()
+  model_summary <- tidy(model)
+  
+  # Get the residual statistics
+  glance_summary <- glance(model)
+  
+  # Create a professional table using gt
+  model_summary %>%
+    gt() %>%
+    tab_header(
+      title = title
+    ) %>%
+    cols_label(
+      term = "Term",
+      estimate = "Estimate",
+      std.error = "Std. Error",
+      statistic = "t Value",
+      p.value = "p-Value"
+    ) %>%
+    fmt_number(
+      columns = vars(estimate, std.error, statistic, p.value),
+      decimals = 3
+    ) %>%
+    tab_source_note(
+      source_note = paste("Residual standard error:", round(glance_summary$sigma, 3), 
+                          "| R-squared:", round(glance_summary$r.squared, 3),
+                          "| Adjusted R-squared:", round(glance_summary$adj.r.squared, 3),
+                          "| F-statistic:", round(glance_summary$statistic, 3), 
+                          "| p-value:", round(glance_summary$p.value, 3))
+    )
+}
+
+# Create tables for each model
+create_model_table(lm1, "Model 1: WNV Incidence ~ Average Temperature")
+create_model_table(lm2, "Model 2: WNV Incidence ~ Average Precipitation")
+create_model_table(lm3, "Model 3: WNV Incidence ~ Drought Severity")
+create_model_table(lm4, "Model 4: WNV Incidence ~ All Variables")
+
+```
+
+
+### State and County Filtering 
+
+To perform our climate change indicator analysis, we are going to use the high risk counties and states we found from the Historic Data (1993-2023). We have also elected to include the 1993-2023 incidence values from the original wnv_full dataset that includes Historic Data from 1993-2023. 
+
+```{r}
+yearly_wnv_combined <- yearly_wnv_combined %>%
+  mutate(total_case = Reported.human.cases + Neuroinvasive.disease.cases + Identified.by.Blood.Donor.Screening)
+
+# Create a vector of FullGeoName for the 114 high-risk counties
+high_risk_counties_vector <- c(
+  "WY, Platte", "WY, Goshen", "TX, Sterling", "TX, Sherman", "TX, Roberts", 
+  "TX, Oldham", "TX, Motley", "TX, King", "TX, Glasscock", "TX, Foard", 
+  "TX, Floyd", "TX, Crosby", "TX, Bailey", "TX, Armstrong", "SD, Walworth",
+  "SD, Sully", "SD, Spink", "SD, Sanborn", "SD, Potter", "SD, Oglala Lakota County",
+  "SD, Miner", "SD, Mellette", "SD, Mcpherson", "SD, Marshall", "SD, Lyman",
+  "SD, Kingsbury", "SD, Jones", "SD, Jerauld", "SD, Jackson", "SD, Hutchinson",
+  "SD, Harding", "SD, Hanson", "SD, Hand", "SD, Hamlin", "SD, Haakon",
+  "SD, Faulk", "SD, Fall River", "SD, Edmunds", "SD, Douglas", "SD, Clark",
+  "SD, Charles Mix", "SD, Campbell", "SD, Buffalo", "SD, Brule", "SD, Brown",
+  "SD, Bon Homme", "SD, Aurora", "OK, Beaver", "NE, York", "NE, Thomas", 
+  "NE, Sioux", "NE, Sheridan", "NE, Polk", "NE, Perkins", "NE, Morrill",
+  "NE, Merrick", "NE, Mcpherson", "NE, Logan", "NE, Keith", "NE, Kearney",
+  "NE, Hooker", "NE, Holt", "NE, Harlan", "NE, Hamilton", "NE, Grant", 
+  "NE, Gosper", "NE, Garden", "NE, Furnas", "NE, Fillmore", "NE, Dundy",
+  "NE, Cuming", "NE, Butler", "NE, Brown", "NE, Boone", "NE, Banner",
+  "ND, Steele", "ND, Sioux", "ND, Sargent", "ND, Nelson", "ND, Mclean",
+  "ND, Mcintosh", "ND, Mchenry", "ND, Logan", "ND, La Moure", "ND, Griggs",
+  "ND, Grant", "ND, Emmons", "ND, Dunn", "ND, Dickey", "ND, Burke",
+  "ND, Billings", "ND, Barnes", "ND, Adams", "MT, Valley", "MT, Treasure",
+  "MT, Sheridan", "MT, Prairie", "MT, Fallon", "MT, Blaine", "MN, Traverse",
+  "KS, Wallace", "KS, Meade", "KS, Gray", "KS, Clark", "ID, Washington",
+  "ID, Owyhee", "CO, Washington", "CO, Sedgwick", "CO, Montrose", 
+  "CO, Logan", "CO, Delta", "CO, Crowley", "CO, Cheyenne"
+)
+
+# Filter yearly_wnv_combined to include only those counties
+counties_filtered_wnv <- yearly_wnv_combined %>%
+  filter(FullGeoName %in% high_risk_counties_vector)
+
+# Create the State column by extracting the state abbreviation from the FullGeoName
+yearly_wnv_combined <- yearly_wnv_combined %>%
+  mutate(State = str_extract(FullGeoName, "^[A-Z]{2}"))  # Extract the first two uppercase letters (state abbreviation)
+
+
+# Create a vector of high-risk states
+high_risk_states_vector <- c("SD", "ND", "NE", "MT", "CO", "WY", "KS", "ID", "TX", "NV", "NM", "MS")
+
+# Filter yearly_wnv_combined to include only the high-risk states based on the "State" column
+states_filtered <- yearly_wnv_combined %>%
+  filter(State %in% high_risk_states_vector)
+
+
+# Assuming high_risk_counties is already loaded and contains the 'FullGeoName' and 'Incidence' columns
+# Merge county_filtered with high_risk_counties to add incidence rates
+county_filtered_with_incidence <- counties_filtered_wnv %>%
+  left_join(high_risk_counties %>% select(FullGeoName, Incidence), by = "FullGeoName")
+
+
+# Assuming high_risk_states is already loaded and contains the 'State' and 'mean_incidence' columns
+# Merge state_filtered with high_risk_states to add state-level incidence rates
+state_filtered_with_incidence <- states_filtered %>%
+  left_join(high_risk_states %>% select(State, mean_incidence), by = "State")
+
+# View the first few rows of the state_filtered dataset with incidence rates added
+head(state_filtered_with_incidence)
+str(state_filtered_with_incidence)
+
+```
+### Including Climate Change Indicators to the Filtered State Dataset 
+
+#### Temperature 
+
+```{r}
+CO_temp <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/State Temps/CO_temp.csv", comment.char="#")
+ID_temp <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/State Temps/ID_temp.csv", comment.char="#")
+KS_temp <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/State Temps/KS_temp.csv", comment.char="#")
+MS_temp <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/State Temps/MS_temp.csv", comment.char="#")
+MT_temp <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/State Temps/MT_temp.csv", comment.char="#")
+ND_temp <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/State Temps/ND_temp.csv", comment.char="#")
+NE_temp <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/State Temps/NE_temp.csv", comment.char="#")
+NM_temp <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/State Temps/NM_temp.csv", comment.char="#")
+NV_temp <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/State Temps/NV_temp.csv", comment.char="#")
+SD_temp <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/State Temps/SD_temp.csv", comment.char="#")
+TX_temp <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/State Temps/TX_temp.csv", comment.char="#")
+WY_temp <- read.csv("~/Desktop/Completed/CPH_Spring24/BIOS8060E/emmahardinparker-MADA-portfolio/WNV/State Temps/WY_temp.csv", comment.char="#")
+
+# Add a 'State' column to each state's temperature dataset
+MS_temp <- MS_temp %>% mutate(State = "MS")
+SD_temp <- SD_temp %>% mutate(State = "SD")
+ND_temp <- ND_temp %>% mutate(State = "ND")
+NE_temp <- NE_temp %>% mutate(State = "NE")
+MT_temp <- MT_temp %>% mutate(State = "MT")
+CO_temp <- CO_temp %>% mutate(State = "CO")
+WY_temp <- WY_temp %>% mutate(State = "WY")
+KS_temp <- KS_temp %>% mutate(State = "KS")
+ID_temp <- ID_temp %>% mutate(State = "ID")
+TX_temp <- TX_temp %>% mutate(State = "TX")
+NV_temp <- NV_temp %>% mutate(State = "NV")
+NM_temp <- NM_temp %>% mutate(State = "NM")
+
+# Combine all the individual state temperature datasets into one
+combined_temp_data <- bind_rows(
+  MS_temp, SD_temp, ND_temp, NE_temp, MT_temp, CO_temp, WY_temp, KS_temp,
+  ID_temp, TX_temp, NV_temp, NM_temp
+)
+
+# Transform the 'Date' column into a 'Year' column
+combined_temp_data <- combined_temp_data %>%
+  mutate(Year = as.numeric(str_sub(Date, 1, 4)))
+
+# Merging datasets
+temp_merged <- combined_temp_data %>%
+  left_join(state_filtered_with_incidence, by = c("Year", "State"))
+
+# Assuming your dataset is called 'your_data'
+temp_merged <- temp_merged[-(1:8), ]
+
+# Assuming your dataset is called `your_data`
+temp_long <- temp_merged %>%
+  pivot_longer(
+    cols = ends_with("Temperature"),  # Select all temperature columns
+    values_to = "Temperature"  # New column for temperature values
+  ) %>%
+  select(Date, Year, State, Temperature, everything())  # Arrange columns as needed
+
+# Assuming your reshaped dataset is called `long_data`
+temp_long <- temp_long %>%
+  group_by(State, Year) %>%
+  fill(Temperature, .direction = "down") %>%
+  ungroup()  # Ungroup if needed for further analysis
+```
+
+##### Descriptive Statistics
+
+```{r}
+# Summary Statistics
+temp_desc <- temp_long %>%
+  summarise(
+    Average_Temperature = mean(Temperature, na.rm = TRUE),
+    Average_Anomaly = mean(Anomaly, na.rm = TRUE),
+    Average_Reported_Cases = mean(Reported.human.cases, na.rm = TRUE),
+    Average_Neuroinvasive_Cases = mean(Neuroinvasive.disease.cases, na.rm = TRUE),
+    Average_Total_Cases = mean(total_case, na.rm = TRUE),
+    Average_Mean_Incidence = mean(mean_incidence, na.rm = TRUE)
+  )
+
+
+
+```
+
+##### Relationship Analysis between Mean Temperature Anomaly and Mean Incidence
+```{r}
+# Step 1: Calculate annual mean anomaly and mean incidence
+annual_data <- temp_long %>%
+  group_by(Year) %>%
+  summarise(
+    Mean_Anomaly = mean(Anomaly, na.rm = TRUE),
+    Mean_Incidence = mean(mean_incidence, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Step 2: Calculate the correlation
+correlation_value <- cor(annual_data$Mean_Anomaly, annual_data$Mean_Incidence, use = "complete.obs")
+
+# Print the correlation
+print(paste("Correlation between Mean Anomaly and Mean Incidence: ", correlation_value))
+
+# Create a scatter plot to visualize the relationship with enhanced aesthetics
+ggplot(annual_data, aes(x = Mean_Anomaly, y = Mean_Incidence)) +
+  geom_point(size = 3, color = "darkgreen", alpha = 0.7) +  # Customize point size and color
+  geom_smooth(method = "lm", se = FALSE, color = "blue", size = 1) +  # Add a regression line
+  labs(
+    title = "Relationship Between Mean Temperature Anomaly and Mean WNV Incidence",
+    subtitle = "Annual averages from 1993 to 2023",
+    x = "Mean Temperature Anomaly (°F)",  # Add x-axis label
+    y = "Mean WNV Incidence (Cases per Year)",  # Add y-axis label
+    caption = "NOAA National Centers for Environmental information, Climate at a Glance: Statewide Time Series"  # Add caption for context
+  ) +
+  theme_minimal(base_size = 14) +  # Use minimal theme with larger base font size
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 13, face = "bold"),  # Center and bold the title
+    plot.subtitle = element_text(hjust = 0.5, size = 11),  # Center the subtitle
+    axis.title.x = element_text(size = 12),  # Customize x-axis title size
+    axis.title.y = element_text(size = 12),  # Customize y-axis title size
+    axis.text = element_text(size = 14),  # Customize axis text size
+    plot.caption = element_text(size = 10, face = "italic")  # Italicize the caption
+  ) +
+  coord_cartesian(clip = "off")  # Allow elements to be clipped outside the plotting area
+
+
+
+ggsave("WNV_Incidence_vs_Temperature_Anomaly.png", width = 10, height = 6, dpi = 300)
+```
+
+Between all high risk states, there is a weak positive relationship between temperature anomaly and mean incidence from years 2000-2023. 
+According to the NCEI, temperature anomalies are more important than the average baseline temperature as positive values indicate warmer than baseline and negative values indicate cooler than baseline; therefore, we elected to analyze temperature anomalies by state. ****  
+
+```{r}
+
+# Step 1: Calculate annual mean anomaly and mean incidence
+annual_data2 <- temp_long %>%
+  group_by(Year) %>%
+  summarise(
+    Mean_Anomaly = mean(Anomaly, na.rm = TRUE),
+    Average_Total_Cases = mean(total_case, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+drop_na(annual_data2)
+
+# Step 2: Calculate the correlation
+correlation_value2 <- cor(annual_data2$Mean_Anomaly, annual_data2$Average_Total_Cases, use = "complete.obs")
+
+# Print the correlation
+print(paste("Correlation between Mean Anomaly and Average Total Cases: ", correlation_value2))
+
+# Create a scatter plot to visualize the relationship with enhanced aesthetics
+ggplot(annual_data2, aes(x = Mean_Anomaly, y = Average_Total_Cases)) +
+  geom_point(size = 3, color = "darkgreen", alpha = 0.7) +  # Customize point size and color
+  geom_smooth(method = "lm", se = FALSE, color = "blue", size = 1) +  # Add a regression line
+  labs(
+    title = "Relationship Between Mean Temperature Anomaly and Average WNV Cases",
+    subtitle = "Annual averages from 1993 to 2023",
+    x = "Mean Temperature Anomaly (°F)",  # Add x-axis label
+    y = "Average WNV Total Cases",  # Add y-axis label
+    caption = "Data Source: NOAA National Centers for Environmental information, Climate at a Glance: Statewide Time Series"  # Add caption for context
+  ) +
+  theme_minimal(base_size = 14) +  # Use minimal theme with larger base font size
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 13, face = "bold"),  # Center and bold the title
+    plot.subtitle = element_text(hjust = 0.5, size = 11),  # Center the subtitle
+    axis.title.x = element_text(size = 12),  # Customize x-axis title size
+    axis.title.y = element_text(size = 12),  # Customize y-axis title size
+    axis.text = element_text(size = 14),  # Customize axis text size
+    plot.caption = element_text(size = 10, face = "italic")  # Italicize the caption
+  ) +
+  coord_cartesian(clip = "off")  # Allow elements to be clipped outside the plotting area
+```
+
+
+
+
+
+
+
+# Results 
+
+## Descriptive Statistics 
+
+
+# Discussion
+
+
+## Strengths and Limitations: 
+
+Strengths: 
+
+Limitations: 
+
+It should be noted that the CDC itself reported limitations of using ArboNET surveillance data. The following limitations were accessed from the [CDC Historic Data Page](https://www.cdc.gov/west-nile-virus/data-maps/historic-data.html) and are reported here for inclusion in our own limitation section. Firstly, the CDC reports that under-reporting is a common limitation to all surveillance systems that solely rely on healthcare providers to consider the disease (WNV) as a possible diagnosis, obtain the proper laboratory tests, and report confirmed diagnoses to public health authorities. Secondly, mild illness (non-neuroinvasive disease) are more likely to be under-reported compared to more severe (neuroinvasive) cases. Thirdly, data are reported using the county of residence of the individual, not necessarily the county or state of exposure, possibly skewing any state and county level data. Finally, non-human surveillance is variably conducted across the country and the absence of non-human activity data should not be interpreted as no risk. 
+
+Our original data sources for climate change indicators were unfortunately affected by the impact of Hurricane Helene in Asheville, North Carolina. We were unable to access some data we were intending to use in our analyses, which resulted in the use of other data sources and analysis techniques. While we find our analyses to be thorough and possess tha chance of having long-term impact on climate change policy and recognition of the impact of climate change on vector-borne diseases, we find it appropriate to mention. 
+
